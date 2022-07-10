@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include <vector>
 
+/* Required:
+  Allocate
+  Release
+  MPI_Abort
+*/
+
 #if !defined(USE_MPI)
 #error "You should specify USE_MPI=0 or USE_MPI=1 on the compile line"
 #endif
@@ -530,6 +536,9 @@ static inline void CalcElemNodeNormals(Real_t pfx[8],
 // Misc
 //**************************************************
 
+/* Depends on:
+  -
+*/
 static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
                            const Real_t x3, const Real_t x4, const Real_t x5,
                            const Real_t y0, const Real_t y1, const Real_t y2,
@@ -563,6 +572,9 @@ static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
 // Collect & Sum
 //**************************************************
 
+/* Depends on:
+  -
+*/
 static inline void CollectDomainNodesToElemNodes(Domain &domain,
                                                  const Index_t *elemToNode,
                                                  Real_t elemX[8],
@@ -606,6 +618,9 @@ static inline void CollectDomainNodesToElemNodes(Domain &domain,
   elemZ[7] = domain.z(nd7i);
 }
 
+/* Depends on:
+  -
+*/
 static inline void SumElemStressesToNodeForces(const Real_t B[][8],
                                                const Real_t stress_xx,
                                                const Real_t stress_yy,
@@ -620,6 +635,9 @@ static inline void SumElemStressesToNodeForces(const Real_t B[][8],
   }
 }
 
+/* Depends on:
+  -
+*/
 static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t *normalZ0,
                                      Real_t *normalX1, Real_t *normalY1, Real_t *normalZ1,
                                      Real_t *normalX2, Real_t *normalY2, Real_t *normalZ2,
@@ -659,6 +677,9 @@ static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t 
 // Init & Integrate
 //**************************************************
 
+/* Depends on:
+  -
+*/
 static inline void InitStressTermsForElems(Domain &domain,
                                            Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
                                            Index_t numElem)
@@ -674,6 +695,12 @@ static inline void InitStressTermsForElems(Domain &domain,
   }
 }
 
+/* Depends on:
+  CollectDomainNodesToElemNodes
+  CalcElemShapeFunctionDerivatives
+  CalcElemNodeNormals
+  SumElemStressesToNodeForces
+*/
 static inline void IntegrateStressForElems(Domain &domain,
                                            Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
                                            Real_t *determ, Index_t numElem, Index_t numNode)
@@ -777,6 +804,9 @@ static inline void IntegrateStressForElems(Domain &domain,
 // Calcs
 //**************************************************
 
+/* Depends on:
+  -
+*/
 static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
                                                     Real_t const y[],
                                                     Real_t const z[],
@@ -877,6 +907,9 @@ static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
   *volume = Real_t(8.) * (fjxet * cjxet + fjyet * cjyet + fjzet * cjzet);
 }
 
+/* Depends on:
+  SumElemFaceNormal
+*/
 static inline void CalcElemNodeNormals(Real_t pfx[8],
                                        Real_t pfy[8],
                                        Real_t pfz[8],
@@ -934,6 +967,9 @@ static inline void CalcElemNodeNormals(Real_t pfx[8],
                     x[6], y[6], z[6], x[5], y[5], z[5]);
 }
 
+/* Depends on:
+  VoluDer
+*/
 static inline void CalcElemVolumeDerivative(Real_t dvdx[8],
                                             Real_t dvdy[8],
                                             Real_t dvdz[8],
@@ -975,6 +1011,9 @@ static inline void CalcElemVolumeDerivative(Real_t dvdx[8],
           &dvdx[7], &dvdy[7], &dvdz[7]);
 }
 
+/* Depends on:
+  -
+*/
 static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd, Real_t hourgam[][4],
                                             Real_t coefficient,
                                             Real_t *hgfx, Real_t *hgfy, Real_t *hgfz)
@@ -1021,6 +1060,10 @@ static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd, 
   }
 }
 
+/* Depends on:
+  CBRT
+  CalcElemFBHourglassForce
+*/
 static inline void CalcFBHourglassForceForElems(Domain &domain,
                                                 Real_t *determ,
                                                 Real_t *x8n, Real_t *y8n, Real_t *z8n,
@@ -1308,6 +1351,11 @@ static inline void CalcFBHourglassForceForElems(Domain &domain,
   }
 }
 
+/* Depends on:
+  CollectDomainNodesToElemNodes
+  CalcElemVolumeDerivative
+  CalcFBHourglassForceForElems
+*/
 static inline void CalcHourglassControlForElems(Domain &domain,
                                                 Real_t determ[], Real_t hgcoef)
 {
@@ -1375,6 +1423,11 @@ static inline void CalcHourglassControlForElems(Domain &domain,
   return;
 }
 
+/* Depends on:
+  InitStressTermsForElems
+  IntegrateStressForElems
+  CalcHourglassControlForElems
+*/
 void CalcVolumeForceForElems_Extern(Domain &domain)
 {
   Index_t numElem = domain.numElem();
