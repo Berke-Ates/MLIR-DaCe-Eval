@@ -5,6 +5,7 @@
 # Exactly one global text symbol needed in the source file
 
 # Settings
+opt_lvl=O0
 out_dir=./out
 
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -28,6 +29,7 @@ printf "$fmt_list" "cgeist:" $cgeist
 printf "$fmt_list" "polygeist-opt:" $polygeist_opt
 printf "$fmt_list" "llc:" $llc
 printf "$fmt_list" "output directory:" $out_dir
+printf "$fmt_list" "optimization lvl:" $opt_lvl
 
 
 set -e # Fail fast
@@ -72,7 +74,7 @@ printf "$fmt_list\n" "Function name:" "$mangled_name"
 # Polygeist c/cpp -> mlir
 # Consider: --memref-abi, --memref-fullrank, --raise-scf-to-affine
 $cgeist -resource-dir=$(clang -print-resource-dir) \
-  -function=$mangled_name -S -O3 -DUSE_MPI=0 \
+  -function=$mangled_name -S -$opt_lvl -DUSE_MPI=0 \
   $src > $out_dir/$src_name.mlir
 cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
 
@@ -120,14 +122,14 @@ $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_start" "Translated to LLVMIR"
 
 # Compile
-$llc -O3 --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
+$llc -$opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_start" "Compiled"
 
 # Assemble
-$clang -c -g -O3 $out_dir/$src_name.s -o $out_dir/$src_name.o
+$clang -c -g -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
 printf "$fmt_start" "Assembled"
 
 # Link
 $clangPP lulesh_driver.cpp $out_dir/$src_name.o \
-  -g -o $out_dir/$src_name.out  -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
+  -g -$opt_lvl -o $out_dir/$src_name.out  -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
 printf "$fmt_start" "Linked"
