@@ -799,7 +799,7 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 
 #ifdef USE_EXTERNAL_CALCS
 /* extern "C"  */ void CalcVolumeForceForElems_Extern(Domain &domain);
-#endif // USE_EXTERNAL_CALCS
+#endif
 
 #ifdef USE_EXTERNAL_VoluDer
 /* extern "C"  */ void VoluDer_Extern(const double x0, const double x1, const double x2,
@@ -809,7 +809,15 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
                                       const double z0, const double z1, const double z2,
                                       const double z3, const double z4, const double z5,
                                       double *dvdx, double *dvdy, double *dvdz);
-#endif // USE_EXTERNAL_VoluDer
+#endif
+
+#ifdef USE_EXTERNAL_SumElemStressesToNodeForces
+/* extern "C"  */ void SumElemStressesToNodeForces(const Real_t B[][8],
+                                                   const Real_t stress_xx,
+                                                   const Real_t stress_yy,
+                                                   const Real_t stress_zz,
+                                                   Real_t fx[], Real_t fy[], Real_t fz[])
+#endif
 
 /********************************lulesh-util.cc********************************/
 
@@ -822,11 +830,11 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 #if USE_MPI
 #include <mpi.h>
 #endif
-// #include "lulesh.h"
+    // #include "lulesh.h"
 
-/* Helper function for converting strings to ints, with error checking */
-template <typename IntT>
-int StrToInt(const char *token, IntT *retVal)
+    /* Helper function for converting strings to ints, with error checking */
+    template <typename IntT>
+    int StrToInt(const char *token, IntT *retVal)
 {
   const char *c;
   char *endptr;
@@ -4828,11 +4836,11 @@ static inline void CalcElemNodeNormals(Real_t pfx[8],
 
 /******************************************/
 
-static inline void SumElemStressesToNodeForces(const Real_t B[][8],
-                                               const Real_t stress_xx,
-                                               const Real_t stress_yy,
-                                               const Real_t stress_zz,
-                                               Real_t fx[], Real_t fy[], Real_t fz[])
+static inline void SumElemStressesToNodeForces_Intern(const Real_t B[][8],
+                                                      const Real_t stress_xx,
+                                                      const Real_t stress_yy,
+                                                      const Real_t stress_zz,
+                                                      Real_t fx[], Real_t fy[], Real_t fz[])
 {
   for (Index_t i = 0; i < 8; i++)
   {
@@ -4840,6 +4848,19 @@ static inline void SumElemStressesToNodeForces(const Real_t B[][8],
     fy[i] = -(stress_yy * B[1][i]);
     fz[i] = -(stress_zz * B[2][i]);
   }
+}
+
+static inline void SumElemStressesToNodeForces(const Real_t B[][8],
+                                               const Real_t stress_xx,
+                                               const Real_t stress_yy,
+                                               const Real_t stress_zz,
+                                               Real_t fx[], Real_t fy[], Real_t fz[])
+{
+#ifdef USE_EXTERNAL_SumElemStressesToNodeForces
+  SumElemStressesToNodeForces_Extern(B, stress_xx, stress_yy, stress_zz, fx, fy, fz);
+#else
+  SumElemStressesToNodeForces_Intern(B, stress_xx, stress_yy, stress_zz, fx, fy, fz);
+#endif
 }
 
 /******************************************/
@@ -4983,22 +5004,16 @@ static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
                            Real_t *dvdx, Real_t *dvdy, Real_t *dvdz)
 {
 #ifdef USE_EXTERNAL_VoluDer
-  VoluDer_Extern(x0, x1, x2,
-                 x3, x4, x5,
-                 y0, y1, y2,
-                 y3, y4, y5,
-                 z0, z1, z2,
-                 z3, z4, z5,
+  VoluDer_Extern(x0, x1, x2, x3, x4, x5,
+                 y0, y1, y2, y3, y4, y5,
+                 z0, z1, z2, z3, z4, z5,
                  dvdx, dvdy, dvdz);
 #else
-  VoluDer_Intern(x0, x1, x2,
-                 x3, x4, x5,
-                 y0, y1, y2,
-                 y3, y4, y5,
-                 z0, z1, z2,
-                 z3, z4, z5,
+  VoluDer_Intern(x0, x1, x2, x3, x4, x5,
+                 y0, y1, y2, y3, y4, y5,
+                 z0, z1, z2, z3, z4, z5,
                  dvdx, dvdy, dvdz);
-#endif // USE_EXTERNAL_VoluDer
+#endif
 }
 
 /******************************************/
@@ -7190,8 +7205,13 @@ int main(int argc, char *argv[])
 #ifdef USE_EXTERNAL_CALCS
     std::cout << "Calc functions\n";
 #endif
+
 #ifdef USE_EXTERNAL_VoluDer
     std::cout << "VoluDer\n";
+#endif
+
+#ifdef USE_EXTERNAL_SumElemStressesToNodeForces
+    std::cout << "SumElemStressesToNodeForces\n";
 #endif
     std::cout << "\n";
 
