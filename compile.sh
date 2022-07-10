@@ -70,8 +70,10 @@ rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
 # Polygeist c/cpp -> mlir
+# Consider: --memref-abi, --memref-fullrank, --raise-scf-to-affine
 $cgeist -resource-dir=$(clang -print-resource-dir) \
-  -function=$mangled_name -S -O3 -DUSE_MPI=0 $src > $out_dir/$src_name.mlir
+  -function=$mangled_name -S -O3 -DUSE_MPI=0 \
+  $src > $out_dir/$src_name.mlir
 cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
 
 # Lower affine 
@@ -80,6 +82,13 @@ if grep -q -i "affine" $out_dir/$src_name.mlir; then
   cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
   printf "$fmt_start" "Lowered Affine"
 fi
+
+# Lower scf 
+# if grep -q -i "scf" $out_dir/$src_name.mlir; then
+#   $mlir_opt --convert-scf-to-cf $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
+#   cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
+#   printf "$fmt_start" "Lowered SCF"
+# fi
 
 # Lower Polygeist
 if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
@@ -94,6 +103,12 @@ $mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llv
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_start" "Lowered to LLVM"
 
+# Rename interface
+sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
+sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
+sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
+printf "$fmt_start" "Renamed Interface"
+
 # Translate
 $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_start" "Translated to LLVMIR"
@@ -103,5 +118,5 @@ $llc -O3 --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_start" "Compiled"
 
 # Assemble
-$clang -c -O3 $out_dir/$src_name.s -o $out_dir/$src_name.o
+$clang -c -g -O3 $out_dir/$src_name.s -o $out_dir/$src_name.o
 printf "$fmt_start" "Assembled"
