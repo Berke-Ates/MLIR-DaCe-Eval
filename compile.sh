@@ -67,11 +67,19 @@ printf "$fmt_list" "Using compiler:" "$(basename ${compiler%.*})"
 $compiler -c $src -DUSE_MPI=0 -o $out_dir/$src_name.o
 mangled_name=$(nm $out_dir/$src_name.o | grep -w T | cut -d ' ' -f3)
 rm $out_dir/$src_name.o
-printf "$fmt_list\n" "Mangled function name:" "$mangled_name"
+printf "$fmt_list\n" "Function name:" "$mangled_name"
 
 # Polygeist c/cpp -> mlir
 $cgeist -resource-dir=$(clang -print-resource-dir) \
   -function=$mangled_name -S -O3 -DUSE_MPI=0 $src > $out_dir/$src_name.mlir
+cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
+
+# Lower affine 
+if grep -q -i "affine" $out_dir/$src_name.mlir; then
+  $mlir_opt --lower-affine $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
+  cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
+  printf "$fmt_start" "Lowered Affine"
+fi
 
 # Lower Polygeist
 if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
@@ -79,13 +87,6 @@ if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
     $out_dir/$src_name.mlir > $out_dir/$src_name\_polygeist.mlir
   cp $out_dir/$src_name\_polygeist.mlir $out_dir/$src_name.mlir
   printf "$fmt_start" "Lowered Polygeist"
-fi
-
-# Lower affine 
-if grep -q -i "affine" $out_dir/$src_name.mlir; then
-  $mlir_opt --lower-affine $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
-  cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
-  printf "$fmt_start" "Lowered Affine"
 fi
 
 # Lower to llvm 
@@ -98,7 +99,7 @@ $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_start" "Translated to LLVMIR"
 
 # Compile
-$llc -O3 $out_dir/$src_name.ll -o $out_dir/$src_name.s
+$llc -O3 --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_start" "Compiled"
 
 # Assemble

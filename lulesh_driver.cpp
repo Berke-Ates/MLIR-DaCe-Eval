@@ -802,13 +802,13 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 #endif // USE_EXTERNAL_CALCS
 
 #ifdef USE_EXTERNAL_VoluDer
-extern "C" void VoluDer_Extern(const double x0, const double x1, const double x2,
-                               const double x3, const double x4, const double x5,
-                               const double y0, const double y1, const double y2,
-                               const double y3, const double y4, const double y5,
-                               const double z0, const double z1, const double z2,
-                               const double z3, const double z4, const double z5,
-                               double *dvdx, double *dvdy, double *dvdz);
+/* extern "C"  */ void VoluDer_Extern(const double x0, const double x1, const double x2,
+                                      const double x3, const double x4, const double x5,
+                                      const double y0, const double y1, const double y2,
+                                      const double y3, const double y4, const double y5,
+                                      const double z0, const double z1, const double z2,
+                                      const double z3, const double z4, const double z5,
+                                      double *dvdx, double *dvdy, double *dvdz);
 #endif // USE_EXTERNAL_VoluDer
 
 /********************************lulesh-util.cc********************************/

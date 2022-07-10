@@ -6,7 +6,7 @@ void VoluDer_Extern(const double x0, const double x1, const double x2,
                     const double z3, const double z4, const double z5,
                     double *dvdx, double *dvdy, double *dvdz)
 {
-  const double twelfth = 1.0 / 12.0;
+  const double twelfth = double(1.0) / double(12.0);
 
   *dvdx =
       (y1 + y2) * (z0 + z1) - (y0 + y1) * (z1 + z2) +
