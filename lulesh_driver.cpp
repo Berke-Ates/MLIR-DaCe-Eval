@@ -795,11 +795,21 @@ void CommMonoQ(Domain &domain);
 void InitMeshDecomp(Int_t numRanks, Int_t myRank,
                     Int_t *col, Int_t *row, Int_t *plane, Int_t *side);
 
-/********************************EXTERNAL_CALCS********************************/
+/********************************EXTERNAL_CALLS********************************/
 
 #ifdef USE_EXTERNAL_CALCS
 /* extern "C"  */ void CalcVolumeForceForElems_Extern(Domain &domain);
 #endif // USE_EXTERNAL_CALCS
+
+#ifdef USE_EXTERNAL_VoluDer
+extern "C" void VoluDer_Extern(const double x0, const double x1, const double x2,
+                               const double x3, const double x4, const double x5,
+                               const double y0, const double y1, const double y2,
+                               const double y3, const double y4, const double y5,
+                               const double z0, const double z1, const double z2,
+                               const double z3, const double z4, const double z5,
+                               double *dvdx, double *dvdy, double *dvdz);
+#endif // USE_EXTERNAL_VoluDer
 
 /********************************lulesh-util.cc********************************/
 
@@ -4935,13 +4945,13 @@ static inline void IntegrateStressForElems(Domain &domain,
 
 /******************************************/
 
-static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
-                           const Real_t x3, const Real_t x4, const Real_t x5,
-                           const Real_t y0, const Real_t y1, const Real_t y2,
-                           const Real_t y3, const Real_t y4, const Real_t y5,
-                           const Real_t z0, const Real_t z1, const Real_t z2,
-                           const Real_t z3, const Real_t z4, const Real_t z5,
-                           Real_t *dvdx, Real_t *dvdy, Real_t *dvdz)
+static inline void VoluDer_Intern(const Real_t x0, const Real_t x1, const Real_t x2,
+                                  const Real_t x3, const Real_t x4, const Real_t x5,
+                                  const Real_t y0, const Real_t y1, const Real_t y2,
+                                  const Real_t y3, const Real_t y4, const Real_t y5,
+                                  const Real_t z0, const Real_t z1, const Real_t z2,
+                                  const Real_t z3, const Real_t z4, const Real_t z5,
+                                  Real_t *dvdx, Real_t *dvdy, Real_t *dvdz)
 {
   const Real_t twelfth = Real_t(1.0) / Real_t(12.0);
 
@@ -4962,6 +4972,33 @@ static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
   *dvdx *= twelfth;
   *dvdy *= twelfth;
   *dvdz *= twelfth;
+}
+
+static inline void VoluDer(const Real_t x0, const Real_t x1, const Real_t x2,
+                           const Real_t x3, const Real_t x4, const Real_t x5,
+                           const Real_t y0, const Real_t y1, const Real_t y2,
+                           const Real_t y3, const Real_t y4, const Real_t y5,
+                           const Real_t z0, const Real_t z1, const Real_t z2,
+                           const Real_t z3, const Real_t z4, const Real_t z5,
+                           Real_t *dvdx, Real_t *dvdy, Real_t *dvdz)
+{
+#ifdef USE_EXTERNAL_VoluDer
+  VoluDer_Extern(x0, x1, x2,
+                 x3, x4, x5,
+                 y0, y1, y2,
+                 y3, y4, y5,
+                 z0, z1, z2,
+                 z3, z4, z5,
+                 dvdx, dvdy, dvdz);
+#else
+  VoluDer_Intern(x0, x1, x2,
+                 x3, x4, x5,
+                 y0, y1, y2,
+                 y3, y4, y5,
+                 z0, z1, z2,
+                 z3, z4, z5,
+                 dvdx, dvdy, dvdz);
+#endif // USE_EXTERNAL_VoluDer
 }
 
 /******************************************/
@@ -7143,14 +7180,21 @@ int main(int argc, char *argv[])
   if ((myRank == 0) && (opts.quiet == 0))
   {
     std::cout << "Running problem size " << opts.nx << "^3 per domain until completion\n";
-#ifdef USE_EXTERNAL_CALCS
-    std::cout << "Using external calc functions\n";
-#endif
     std::cout << "Num processors: " << numRanks << "\n";
 #if _OPENMP
     std::cout << "Num threads: " << omp_get_max_threads() << "\n";
 #endif
     std::cout << "Total number of elements: " << ((Int8_t)numRanks * opts.nx * opts.nx * opts.nx) << " \n\n";
+
+    std::cout << "External functions:\n";
+#ifdef USE_EXTERNAL_CALCS
+    std::cout << "Calc functions\n";
+#endif
+#ifdef USE_EXTERNAL_VoluDer
+    std::cout << "VoluDer\n";
+#endif
+    std::cout << "\n";
+
     std::cout << "To run other sizes, use -s <integer>.\n";
     std::cout << "To run a fixed number of iterations, use -i <integer>.\n";
     std::cout << "To run a more or less balanced region set, use -b <integer>.\n";
