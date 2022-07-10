@@ -78,7 +78,8 @@ cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
 
 # Lower affine 
 if grep -q -i "affine" $out_dir/$src_name.mlir; then
-  $mlir_opt --lower-affine $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
+  $mlir_opt --lower-affine --allow-unregistered-dialect \
+    $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
   cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
   printf "$fmt_start" "Lowered Affine"
 fi
@@ -86,7 +87,8 @@ fi
 # Lower scf 
 # Should be done by --lower-host-to-llvm automatically
 # if grep -q -i "scf" $out_dir/$src_name.mlir; then
-#   $mlir_opt --convert-scf-to-cf $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
+#   $mlir_opt --convert-scf-to-cf --allow-unregistered-dialect \
+#      $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
 #   cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
 #   printf "$fmt_start" "Lowered SCF"
 # fi
@@ -106,10 +108,12 @@ printf "$fmt_start" "Lowered to LLVM"
 
 # Rename interface
 # Unsure if needed
-# sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
-# sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
-# sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
-# printf "$fmt_start" "Renamed Interface"
+if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
+  sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
+  sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
+  sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
+  printf "$fmt_start" "Renamed Interface"
+fi
 
 # Translate
 $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
