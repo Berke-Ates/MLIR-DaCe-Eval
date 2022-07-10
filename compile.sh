@@ -84,6 +84,7 @@ if grep -q -i "affine" $out_dir/$src_name.mlir; then
 fi
 
 # Lower scf 
+# Should be done by --lower-host-to-llvm automatically
 # if grep -q -i "scf" $out_dir/$src_name.mlir; then
 #   $mlir_opt --convert-scf-to-cf $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
 #   cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
@@ -104,10 +105,11 @@ cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_start" "Lowered to LLVM"
 
 # Rename interface
-sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
-sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
-sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
-printf "$fmt_start" "Renamed Interface"
+# Unsure if needed
+# sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
+# sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
+# sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
+# printf "$fmt_start" "Renamed Interface"
 
 # Translate
 $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
@@ -120,3 +122,8 @@ printf "$fmt_start" "Compiled"
 # Assemble
 $clang -c -g -O3 $out_dir/$src_name.s -o $out_dir/$src_name.o
 printf "$fmt_start" "Assembled"
+
+# Link
+$clangPP lulesh_driver.cpp $out_dir/$src_name.o \
+  -g -o $out_dir/$src_name.out  -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
+printf "$fmt_start" "Linked"
