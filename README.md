@@ -27,4 +27,4 @@ cmake -G Ninja ../llvm \
 - `calcs.cpp` contains the extracted calc functions in their unaltered state 
    (just for reference)
 - `mod_calcs.cpp` is a modified version of the calc functions
-- `script.sh` generates mlir code from `calcs.cpp`
+- `compile.sh` compiles an object file from a cpp file going through MLIR
