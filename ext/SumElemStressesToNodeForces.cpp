@@ -1,8 +1,8 @@
-void SumElemStressesToNodeForces(const double B[][8],
-                                 const double stress_xx,
-                                 const double stress_yy,
-                                 const double stress_zz,
-                                 double fx[], double fy[], double fz[])
+void SumElemStressesToNodeForces_Extern(const double B[][8],
+                                        const double stress_xx,
+                                        const double stress_yy,
+                                        const double stress_zz,
+                                        double fx[], double fy[], double fz[])
 {
   for (signed int i = 0; i < 8; i++)
   {

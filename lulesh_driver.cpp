@@ -802,21 +802,32 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 #endif
 
 #ifdef USE_EXTERNAL_VoluDer
-/* extern "C"  */ void VoluDer_Extern(const double x0, const double x1, const double x2,
-                                      const double x3, const double x4, const double x5,
-                                      const double y0, const double y1, const double y2,
-                                      const double y3, const double y4, const double y5,
-                                      const double z0, const double z1, const double z2,
-                                      const double z3, const double z4, const double z5,
-                                      double *dvdx, double *dvdy, double *dvdz);
+void VoluDer_Extern(const double x0, const double x1, const double x2,
+                    const double x3, const double x4, const double x5,
+                    const double y0, const double y1, const double y2,
+                    const double y3, const double y4, const double y5,
+                    const double z0, const double z1, const double z2,
+                    const double z3, const double z4, const double z5,
+                    double *dvdx, double *dvdy, double *dvdz);
 #endif
 
 #ifdef USE_EXTERNAL_SumElemStressesToNodeForces
-/* extern "C"  */ void SumElemStressesToNodeForces(const Real_t B[][8],
-                                                   const Real_t stress_xx,
-                                                   const Real_t stress_yy,
-                                                   const Real_t stress_zz,
-                                                   Real_t fx[], Real_t fy[], Real_t fz[])
+void SumElemStressesToNodeForces_Extern(const double B[][8],
+                                        const double stress_xx,
+                                        const double stress_yy,
+                                        const double stress_zz,
+                                        double fx[], double fy[], double fz[]);
+#endif
+
+#ifdef USE_EXTERNAL_SumElemFaceNormal
+void SumElemFaceNormal_Extern(double *normalX0, double *normalY0, double *normalZ0,
+                              double *normalX1, double *normalY1, double *normalZ1,
+                              double *normalX2, double *normalY2, double *normalZ2,
+                              double *normalX3, double *normalY3, double *normalZ3,
+                              const double x0, const double y0, const double z0,
+                              const double x1, const double y1, const double z1,
+                              const double x2, const double y2, const double z2,
+                              const double x3, const double y3, const double z3);
 #endif
 
 /********************************lulesh-util.cc********************************/
@@ -830,11 +841,11 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 #if USE_MPI
 #include <mpi.h>
 #endif
-    // #include "lulesh.h"
+// #include "lulesh.h"
 
-    /* Helper function for converting strings to ints, with error checking */
-    template <typename IntT>
-    int StrToInt(const char *token, IntT *retVal)
+/* Helper function for converting strings to ints, with error checking */
+template <typename IntT>
+int StrToInt(const char *token, IntT *retVal)
 {
   const char *c;
   char *endptr;
@@ -4740,14 +4751,14 @@ static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
 
 /******************************************/
 
-static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t *normalZ0,
-                                     Real_t *normalX1, Real_t *normalY1, Real_t *normalZ1,
-                                     Real_t *normalX2, Real_t *normalY2, Real_t *normalZ2,
-                                     Real_t *normalX3, Real_t *normalY3, Real_t *normalZ3,
-                                     const Real_t x0, const Real_t y0, const Real_t z0,
-                                     const Real_t x1, const Real_t y1, const Real_t z1,
-                                     const Real_t x2, const Real_t y2, const Real_t z2,
-                                     const Real_t x3, const Real_t y3, const Real_t z3)
+static inline void SumElemFaceNormal_Intern(Real_t *normalX0, Real_t *normalY0, Real_t *normalZ0,
+                                            Real_t *normalX1, Real_t *normalY1, Real_t *normalZ1,
+                                            Real_t *normalX2, Real_t *normalY2, Real_t *normalZ2,
+                                            Real_t *normalX3, Real_t *normalY3, Real_t *normalZ3,
+                                            const Real_t x0, const Real_t y0, const Real_t z0,
+                                            const Real_t x1, const Real_t y1, const Real_t z1,
+                                            const Real_t x2, const Real_t y2, const Real_t z2,
+                                            const Real_t x3, const Real_t y3, const Real_t z3)
 {
   Real_t bisectX0 = Real_t(0.5) * (x3 + x2 - x1 - x0);
   Real_t bisectY0 = Real_t(0.5) * (y3 + y2 - y1 - y0);
@@ -4773,6 +4784,36 @@ static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t 
   *normalZ1 += areaZ;
   *normalZ2 += areaZ;
   *normalZ3 += areaZ;
+}
+
+static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t *normalZ0,
+                                     Real_t *normalX1, Real_t *normalY1, Real_t *normalZ1,
+                                     Real_t *normalX2, Real_t *normalY2, Real_t *normalZ2,
+                                     Real_t *normalX3, Real_t *normalY3, Real_t *normalZ3,
+                                     const Real_t x0, const Real_t y0, const Real_t z0,
+                                     const Real_t x1, const Real_t y1, const Real_t z1,
+                                     const Real_t x2, const Real_t y2, const Real_t z2,
+                                     const Real_t x3, const Real_t y3, const Real_t z3)
+{
+#ifdef USE_EXTERNAL_SumElemFaceNormal
+  SumElemFaceNormal_Extern(normalX0, normalY0, normalZ0,
+                           normalX1, normalY1, normalZ1,
+                           normalX2, normalY2, normalZ2,
+                           normalX3, normalY3, normalZ3,
+                           x0, y0, z0,
+                           x1, y1, z1,
+                           x2, y2, z2,
+                           x3, y3, z3);
+#else
+  SumElemFaceNormal_Intern(normalX0, normalY0, normalZ0,
+                           normalX1, normalY1, normalZ1,
+                           normalX2, normalY2, normalZ2,
+                           normalX3, normalY3, normalZ3,
+                           x0, y0, z0,
+                           x1, y1, z1,
+                           x2, y2, z2,
+                           x3, y3, z3);
+#endif
 }
 
 /******************************************/
@@ -7212,6 +7253,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_SumElemStressesToNodeForces
     std::cout << "SumElemStressesToNodeForces\n";
+#endif
+
+#ifdef USE_EXTERNAL_SumElemFaceNormal
+    std::cout << "SumElemFaceNormal\n";
 #endif
     std::cout << "\n";
 
