@@ -5,7 +5,7 @@
 # Exactly one global text symbol needed in the source file
 
 # Settings
-driver=basic_driver.cpp
+driver=lulesh_driver.cpp
 opt_lvl=O0
 out_dir=./out
 
@@ -73,64 +73,86 @@ rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
 # Polygeist c/cpp -> mlir
-# Consider: --memref-abi, --memref-fullrank, --raise-scf-to-affine
-$cgeist -resource-dir=$(clang -print-resource-dir) \
-  -function=$mangled_name -S -$opt_lvl -DUSE_MPI=0 \
-  $src > $out_dir/$src_name.mlir
+$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
+  -S --memref-fullrank --memref-abi=0 --struct-abi=0 -$opt_lvl -DUSE_MPI=0 \
+  --raise-scf-to-affine $src > $out_dir/$src_name.mlir
 cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
+printf "$fmt_start" "Lowered to:" "MLIR"
 
 # Lower affine 
 if grep -q -i "affine" $out_dir/$src_name.mlir; then
   $mlir_opt --lower-affine --allow-unregistered-dialect \
     $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
   cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
-  printf "$fmt_start" "Lowered:" "Affine"
+  printf "$fmt_list" "Lowered:" "Affine"
 fi
 
 # Lower scf 
-# Should be done by --lower-host-to-llvm automatically
-# if grep -q -i "scf" $out_dir/$src_name.mlir; then
-#   $mlir_opt --convert-scf-to-cf --allow-unregistered-dialect \
-#      $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
-#   cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
-#   printf "$fmt_start" "Lowered:" "SCF"
-# fi
+if grep -q -i "scf" $out_dir/$src_name.mlir; then
+  $mlir_opt --convert-scf-to-cf --allow-unregistered-dialect \
+     $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
+  cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
+  printf "$fmt_list" "Lowered:" "SCF"
+fi
+
+# Lower cf
+if grep -q -i "cf" $out_dir/$src_name.mlir; then
+  $mlir_opt --convert-cf-to-llvm --allow-unregistered-dialect \
+     $out_dir/$src_name.mlir > $out_dir/$src_name\_cf.mlir
+  cp $out_dir/$src_name\_cf.mlir $out_dir/$src_name.mlir
+  printf "$fmt_list" "Lowered:" "CF"
+fi
 
 # Lower Polygeist
 if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
   $polygeist_opt --convert-polygeist-to-llvm \
     $out_dir/$src_name.mlir > $out_dir/$src_name\_polygeist.mlir
   cp $out_dir/$src_name\_polygeist.mlir $out_dir/$src_name.mlir
-  printf "$fmt_start" "Lowered:" "Polygeist"
+  printf "$fmt_list" "Lowered:" "Polygeist"
 fi
 
 # Lower to llvm 
 $mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llvm.mlir
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
-printf "$fmt_start" "Lowered to:" "LLVM"
+printf "$fmt_list" "Lowered to:" "LLVM"
 
 # Rename interface
 # Unsure if needed
-if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
-  sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
-  sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
-  sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
-  printf "$fmt_start" "Renamed Interface"
-fi
+# if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
+#   sed -i -e "s/_mlir_ciface_$mangled_name/_mlir_ciface_/g" $out_dir/$src_name.mlir
+#   sed -i -e "s/$mangled_name/$mangled_name\_renamed/g" $out_dir/$src_name.mlir
+#   sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
+#   printf "$fmt_list" "Renamed Interface"
+# fi
 
 # Translate
 $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
-printf "$fmt_start" "Translated to:" "LLVMIR"
+printf "$fmt_list" "Translated to:" "LLVMIR"
 
 # Compile
 $llc -$opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
-printf "$fmt_start" "Compiled using:" "LLC"
+printf "$fmt_start_nl" "Compiled using:" "LLC"
 
 # Assemble
 $clangPP -c -g -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
-printf "$fmt_start" "Assembled using:" "clang++"
+printf "$fmt_list" "Assembled using:" "Clang++"
 
 # Link
 $clangPP $driver $out_dir/$src_name.o \
   -g -$opt_lvl -o $out_dir/$src_name.out -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
-printf "$fmt_start" "Linked with:" $driver
+printf "$fmt_list" "Linked with:" $driver
+
+# Execute
+printf "$fmt_start_nl" "Executing:" "$out_dir/$src_name.out"
+res=$(./$out_dir/$src_name.out)
+printf "\n%s\n" "$res"
+
+# Check for correctness
+expected=$(grep -A8 "Run completed" normal_output.txt)
+actual=$(echo "$res" | grep -A8 "Run completed")
+
+if [[ "$s1" == "$s2" ]]; then
+printf "$fmt_start_nl" "Output correct"
+else
+printf "$fmt_err" "Wrong output"
+fi
