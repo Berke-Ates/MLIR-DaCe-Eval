@@ -151,7 +151,7 @@ printf "\n%s\n" "$res"
 expected=$(grep -A8 "Run completed" normal_output.txt)
 actual=$(echo "$res" | grep -A8 "Run completed")
 
-if [[ "$s1" == "$s2" ]]; then
+if [[ "$actual" == "$expected" ]]; then
 printf "$fmt_start_nl" "Output correct"
 else
 printf "$fmt_err" "Wrong output"
