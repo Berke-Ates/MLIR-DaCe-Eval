@@ -797,10 +797,6 @@ void InitMeshDecomp(Int_t numRanks, Int_t myRank,
 
 /********************************EXTERNAL_CALLS********************************/
 
-#ifdef USE_EXTERNAL_CALCS
-/* extern "C"  */ void CalcVolumeForceForElems_Extern(Domain &domain);
-#endif
-
 #ifdef USE_EXTERNAL_VoluDer
 void VoluDer_Extern(const double x0, const double x1, const double x2,
                     const double x3, const double x4, const double x5,
@@ -828,6 +824,14 @@ void SumElemFaceNormal_Extern(double *normalX0, double *normalY0, double *normal
                               const double x1, const double y1, const double z1,
                               const double x2, const double y2, const double z2,
                               const double x3, const double y3, const double z3);
+#endif
+
+#ifdef USE_EXTERNAL_CalcElemShapeFunctionDerivatives
+void CalcElemShapeFunctionDerivatives_Extern(double const x[],
+                                             double const y[],
+                                             double const z[],
+                                             double b[][8],
+                                             double *const volume);
 #endif
 
 /********************************lulesh-util.cc********************************/
@@ -4648,12 +4652,12 @@ static inline void InitStressTermsForElems(Domain &domain,
 }
 
 /******************************************/
-// NOTE: EXTERN?
-static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
-                                                    Real_t const y[],
-                                                    Real_t const z[],
-                                                    Real_t b[][8],
-                                                    Real_t *const volume)
+
+static inline void CalcElemShapeFunctionDerivatives_Intern(Real_t const x[],
+                                                           Real_t const y[],
+                                                           Real_t const z[],
+                                                           Real_t b[][8],
+                                                           Real_t *const volume)
 {
   const Real_t x0 = x[0];
   const Real_t x1 = x[1];
@@ -4747,6 +4751,19 @@ static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
 
   /* calculate jacobian determinant (volume) */
   *volume = Real_t(8.) * (fjxet * cjxet + fjyet * cjyet + fjzet * cjzet);
+}
+
+static inline void CalcElemShapeFunctionDerivatives(Real_t const x[],
+                                                    Real_t const y[],
+                                                    Real_t const z[],
+                                                    Real_t b[][8],
+                                                    Real_t *const volume)
+{
+#ifdef USE_EXTERNAL_CalcElemShapeFunctionDerivatives
+  CalcElemShapeFunctionDerivatives_Extern(x, y, z, b, volume);
+#else
+  CalcElemShapeFunctionDerivatives_Intern(x, y, z, b, volume);
+#endif
 }
 
 /******************************************/
@@ -7243,10 +7260,6 @@ int main(int argc, char *argv[])
     std::cout << "Total number of elements: " << ((Int8_t)numRanks * opts.nx * opts.nx * opts.nx) << " \n\n";
 
     std::cout << "External functions:\n";
-#ifdef USE_EXTERNAL_CALCS
-    std::cout << "Calc functions\n";
-#endif
-
 #ifdef USE_EXTERNAL_VoluDer
     std::cout << "VoluDer\n";
 #endif
@@ -7258,6 +7271,11 @@ int main(int argc, char *argv[])
 #ifdef USE_EXTERNAL_SumElemFaceNormal
     std::cout << "SumElemFaceNormal\n";
 #endif
+
+#ifdef USE_EXTERNAL_CalcElemShapeFunctionDerivatives
+    std::cout << "CalcElemShapeFunctionDerivatives\n";
+#endif
+
     std::cout << "\n";
 
     std::cout << "To run other sizes, use -s <integer>.\n";
