@@ -834,6 +834,15 @@ void CalcElemShapeFunctionDerivatives_Extern(double const x[],
                                              double *const volume);
 #endif
 
+#ifdef USE_EXTERNAL_CalcElemVolumeDerivative
+void CalcElemVolumeDerivative_Extern(double dvdx[8],
+                                     double dvdy[8],
+                                     double dvdz[8],
+                                     const double x[8],
+                                     const double y[8],
+                                     const double z[8]);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -7274,6 +7283,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CalcElemShapeFunctionDerivatives
     std::cout << "CalcElemShapeFunctionDerivatives\n";
+#endif
+
+#ifdef USE_EXTERNAL_CalcElemVolumeDerivative
+    std::cout << "CalcElemVolumeDerivative\n";
 #endif
 
     std::cout << "\n";
