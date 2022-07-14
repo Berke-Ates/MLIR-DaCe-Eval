@@ -843,6 +843,12 @@ void CalcElemVolumeDerivative_Extern(double dvdx[8],
                                      const double z[8]);
 #endif
 
+#ifdef USE_EXTERNAL_CalcElemFBHourglassForce
+void CalcElemFBHourglassForce_Extern(double *xd, double *yd, double *zd,
+                                     double hourgam[][4], double coefficient,
+                                     double *hgfx, double *hgfy, double *hgfz);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -5127,10 +5133,10 @@ static inline void CalcElemVolumeDerivative(Real_t dvdx[8],
 }
 
 /******************************************/
-// NOTE: EXTERN?
-static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd, Real_t hourgam[][4],
-                                            Real_t coefficient,
-                                            Real_t *hgfx, Real_t *hgfy, Real_t *hgfz)
+
+static inline void CalcElemFBHourglassForce_Intern(Real_t *xd, Real_t *yd, Real_t *zd,
+                                                   Real_t hourgam[][4], Real_t coefficient,
+                                                   Real_t *hgfx, Real_t *hgfy, Real_t *hgfz)
 {
   Real_t hxx[4];
   for (Index_t i = 0; i < 4; i++)
@@ -5172,6 +5178,21 @@ static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd, 
               (hourgam[i][0] * hxx[0] + hourgam[i][1] * hxx[1] +
                hourgam[i][2] * hxx[2] + hourgam[i][3] * hxx[3]);
   }
+}
+
+static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd,
+                                            Real_t hourgam[][4], Real_t coefficient,
+                                            Real_t *hgfx, Real_t *hgfy, Real_t *hgfz)
+{
+#ifdef USE_EXTERNAL_CalcElemFBHourglassForce
+  CalcElemFBHourglassForce_Extern(xd, yd, zd,
+                                  hourgam, coefficient,
+                                  hgfx, hgfy, hgfz);
+#else
+  CalcElemFBHourglassForce_Intern(xd, yd, zd,
+                                  hourgam, coefficient,
+                                  hgfx, hgfy, hgfz);
+#endif
 }
 
 /******************************************/
@@ -7289,6 +7310,9 @@ int main(int argc, char *argv[])
     std::cout << "CalcElemVolumeDerivative\n";
 #endif
 
+#ifdef USE_EXTERNAL_CalcElemFBHourglassForce
+    std::cout << "CalcElemFBHourglassForce\n";
+#endif
     std::cout << "\n";
 
     std::cout << "To run other sizes, use -s <integer>.\n";
