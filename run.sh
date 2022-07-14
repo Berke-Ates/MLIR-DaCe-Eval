@@ -57,6 +57,7 @@ rm -rf $out_dir/* # Clear output directory
 src=$1
 src_name=$(basename ${src%.*})
 src_ext=${src##*.}
+src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Choose compiler based on C or C++
@@ -66,9 +67,31 @@ if [ "$src_ext" == "c" ]; then
 fi
 printf "$fmt_list" "Using compiler:" "$(basename ${compiler%.*})"
 
+# Replace inserts
+if grep -q -i "#insert" $src; then
+  cp $src $out_dir/$src_name\_inserted.$src_ext
+  inserts=$(grep -E "^#insert"  $src)
+
+  while IFS= read -r line; do
+    fname=$(echo $line | cut -d ' ' -f 2)
+
+    if [ ! -f $src_dir/$fname ]; then
+      printf "$fmt_err" "Insert file not found: $src_dir/$fname"
+      exit 1
+    fi
+
+    sed -i -e "/$line/r$src_dir/$fname" $out_dir/$src_name\_inserted.$src_ext
+    sed -i -e "s/$line//" $out_dir/$src_name\_inserted.$src_ext
+
+    printf "$fmt_list" "Replaced:" "$line"
+  done <<< "$inserts"
+
+  src=$out_dir/$src_name\_inserted.$src_ext
+fi
+
 # Find mangled name
 $compiler -c $src -DUSE_MPI=0 -o $out_dir/$src_name.o
-mangled_name=$(nm $out_dir/$src_name.o | grep -w T | cut -d ' ' -f3)
+mangled_name=$(nm $out_dir/$src_name.o | grep $src_name | cut -d ' ' -f3)
 rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
