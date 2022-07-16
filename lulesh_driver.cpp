@@ -930,6 +930,30 @@ void CalcHourglassControlForElems_Extern(std::vector<double> &m_x,
                                          double determ[], double hgcoef);
 #endif
 
+#ifdef USE_EXTERNAL_CalcVolumeForceForElems
+void CalcVolumeForceForElems_Extern(std::vector<double> &m_p,
+                                    std::vector<double> &m_q,
+                                    std::vector<double> &m_x,
+                                    std::vector<double> &m_y,
+                                    std::vector<double> &m_z,
+                                    std::vector<double> &m_fx,
+                                    std::vector<double> &m_fy,
+                                    std::vector<double> &m_fz,
+                                    std::vector<signed int> &m_nodelist,
+                                    signed int *m_nodeElemStart,
+                                    signed int *m_nodeElemCornerList,
+                                    signed int m_numElem,
+                                    std::vector<double> &m_volo,
+                                    std::vector<double> &m_v,
+                                    std::vector<double> &m_ss,
+                                    std::vector<double> &m_elemMass,
+                                    std::vector<double> &m_xd,
+                                    std::vector<double> &m_yd,
+                                    std::vector<double> &m_zd,
+                                    signed int m_numNode,
+                                    double m_hgcoef);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -5776,8 +5800,8 @@ static inline void CalcHourglassControlForElems_Intern(Domain &domain,
 }
 
 /******************************************/
-// NOTE: EXTERN?
-static inline void CalcVolumeForceForElems(Domain &domain)
+
+static inline void CalcVolumeForceForElems_Intern(Domain &domain)
 {
 #ifdef USE_EXTERNAL_CALCS
   CalcVolumeForceForElems_Extern(domain);
@@ -5822,6 +5846,35 @@ static inline void CalcVolumeForceForElems(Domain &domain)
     Release(&sigxx);
   }
 #endif // USE_EXTERNAL_CALCS
+}
+
+static inline void CalcVolumeForceForElems(Domain &domain)
+{
+#ifdef USE_EXTERNAL_CalcVolumeForceForElems
+  CalcVolumeForceForElems_Extern(domain.m_p,
+                                 domain.m_q,
+                                 domain.m_x,
+                                 domain.m_y,
+                                 domain.m_z,
+                                 domain.m_fx,
+                                 domain.m_fy,
+                                 domain.m_fz,
+                                 domain.m_nodelist,
+                                 domain.m_nodeElemStart,
+                                 domain.m_nodeElemCornerList,
+                                 domain.m_numElem,
+                                 domain.m_volo,
+                                 domain.m_v,
+                                 domain.m_ss,
+                                 domain.m_elemMass,
+                                 domain.m_xd,
+                                 domain.m_yd,
+                                 domain.m_zd,
+                                 domain.m_numNode,
+                                 domain.m_hgcoef);
+#else
+  CalcVolumeForceForElems_Intern(domain);
+#endif
 }
 
 /******************************************/
@@ -7558,6 +7611,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CalcHourglassControlForElems
     std::cout << "CalcHourglassControlForElems\n";
+#endif
+
+#ifdef USE_EXTERNAL_CalcVolumeForceForElems
+    std::cout << "CalcVolumeForceForElems\n";
 #endif
     std::cout << "\n";
 

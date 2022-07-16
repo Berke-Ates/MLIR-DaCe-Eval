@@ -22,9 +22,12 @@ cmake -G Ninja ../llvm \
 
 ## Files
 - `normal_output.txt` contains the output of a regular run
-- `lulesh_driver.cpp` is a modified LULESH benchmark, which uses external calc 
-  function provided the `-DUSE_EXTERNAL_CALCS` flag
+- `lulesh_driver.cpp` is a modified LULESH benchmark, which uses external 
+  functions provided the `-DUSE_EXTERNAL_<function>` flag
 - `calcs.cpp` contains the extracted calc functions in their unaltered state 
    (just for reference)
-- `mod_calcs.cpp` is a modified version of the calc functions
-- `compile.sh` compiles an object file from a cpp file going through MLIR
+- `ext/` contains all the functions in their altered form
+- `run.sh ext/<function>.cpp` compiles the provided function using Polygeist,
+links with the driver (settings the `-DUSE_EXTERNAL_<function>` flag), runs the
+result and checks with `normal_output.txt` for correctness
+

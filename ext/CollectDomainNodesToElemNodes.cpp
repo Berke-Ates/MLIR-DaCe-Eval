@@ -1,3 +1,6 @@
+#ifndef EXTERNAL_COLLECTDOMAINNODESTOELEMNODES
+#define EXTERNAL_COLLECTDOMAINNODESTOELEMNODES
+
 #include <vector>
 
 void CollectDomainNodesToElemNodes_Extern(std::vector<double> &m_x,
@@ -44,3 +47,5 @@ void CollectDomainNodesToElemNodes_Extern(std::vector<double> &m_x,
   elemZ[6] = m_z[nd6i];
   elemZ[7] = m_z[nd7i];
 }
+
+#endif

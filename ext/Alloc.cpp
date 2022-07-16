@@ -1,7 +1,7 @@
-#include <stdlib.h>
-
 #ifndef EXTERNAL_ALLOCATE
 #define EXTERNAL_ALLOCATE
+
+#include <stdlib.h>
 
 template <typename T>
 T *Allocate(size_t size)
