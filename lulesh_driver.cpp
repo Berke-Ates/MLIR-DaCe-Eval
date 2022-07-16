@@ -866,6 +866,15 @@ void InitStressTermsForElems_Extern(std::vector<double> &m_p,
                                     signed int numElem);
 #endif
 
+#ifdef USE_EXTERNAL_CalcElemNodeNormals
+void CalcElemNodeNormals_Extern(double pfx[8],
+                                double pfy[8],
+                                double pfz[8],
+                                const double x[8],
+                                const double y[8],
+                                const double z[8]);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -4906,12 +4915,12 @@ static inline void SumElemFaceNormal(Real_t *normalX0, Real_t *normalY0, Real_t 
 
 /******************************************/
 
-static inline void CalcElemNodeNormals(Real_t pfx[8],
-                                       Real_t pfy[8],
-                                       Real_t pfz[8],
-                                       const Real_t x[8],
-                                       const Real_t y[8],
-                                       const Real_t z[8])
+static inline void CalcElemNodeNormals_Intern(Real_t pfx[8],
+                                              Real_t pfy[8],
+                                              Real_t pfz[8],
+                                              const Real_t x[8],
+                                              const Real_t y[8],
+                                              const Real_t z[8])
 {
   for (Index_t i = 0; i < 8; ++i)
   {
@@ -4961,6 +4970,22 @@ static inline void CalcElemNodeNormals(Real_t pfx[8],
                     &pfx[5], &pfy[5], &pfz[5],
                     x[4], y[4], z[4], x[7], y[7], z[7],
                     x[6], y[6], z[6], x[5], y[5], z[5]);
+}
+
+static inline void CalcElemNodeNormals(Real_t pfx[8],
+                                       Real_t pfy[8],
+                                       Real_t pfz[8],
+                                       const Real_t x[8],
+                                       const Real_t y[8],
+                                       const Real_t z[8])
+{
+#ifdef USE_EXTERNAL_CalcElemNodeNormals
+  CalcElemNodeNormals_Extern(pfx, pfy, pfz,
+                             x, y, z);
+#else
+  CalcElemNodeNormals_Intern(pfx, pfy, pfz,
+                             x, y, z);
+#endif
 }
 
 /******************************************/
@@ -7376,6 +7401,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_InitStressTermsForElems
     std::cout << "InitStressTermsForElems\n";
+#endif
+
+#ifdef USE_EXTERNAL_CalcElemNodeNormals
+    std::cout << "CalcElemNodeNormals\n";
 #endif
     std::cout << "\n";
 
