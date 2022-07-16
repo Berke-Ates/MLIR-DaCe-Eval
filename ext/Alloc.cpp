@@ -1,5 +1,8 @@
 #include <stdlib.h>
 
+#ifndef EXTERNAL_ALLOCATE
+#define EXTERNAL_ALLOCATE
+
 template <typename T>
 T *Allocate(size_t size)
 {
@@ -15,3 +18,5 @@ void Release(T **ptr)
     *ptr = NULL;
   }
 }
+
+#endif
