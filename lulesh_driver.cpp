@@ -859,6 +859,13 @@ void CollectDomainNodesToElemNodes_Extern(std::vector<double> &m_x,
                                           double elemZ[8]);
 #endif
 
+#ifdef USE_EXTERNAL_InitStressTermsForElems
+void InitStressTermsForElems_Extern(std::vector<double> &m_p,
+                                    std::vector<double> &m_q,
+                                    double *sigxx, double *sigyy, double *sigzz,
+                                    signed int numElem);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -4684,9 +4691,9 @@ static inline void CollectDomainNodesToElemNodes(Domain &domain,
 
 /******************************************/
 
-static inline void InitStressTermsForElems(Domain &domain,
-                                           Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
-                                           Index_t numElem)
+static inline void InitStressTermsForElems_Intern(Domain &domain,
+                                                  Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
+                                                  Index_t numElem)
 {
   //
   // pull in the stresses appropriate to the hydro integration
@@ -4697,6 +4704,22 @@ static inline void InitStressTermsForElems(Domain &domain,
   {
     sigxx[i] = sigyy[i] = sigzz[i] = -domain.p(i) - domain.q(i);
   }
+}
+
+static inline void InitStressTermsForElems(Domain &domain,
+                                           Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
+                                           Index_t numElem)
+{
+#ifdef USE_EXTERNAL_InitStressTermsForElems
+  InitStressTermsForElems_Extern(domain.m_p,
+                                 domain.m_q,
+                                 sigxx, sigyy, sigzz,
+                                 numElem);
+#else
+  InitStressTermsForElems_Intern(domain,
+                                 sigxx, sigyy, sigzz,
+                                 numElem);
+#endif
 }
 
 /******************************************/
@@ -7349,6 +7372,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CollectDomainNodesToElemNodes
     std::cout << "CollectDomainNodesToElemNodes\n";
+#endif
+
+#ifdef USE_EXTERNAL_InitStressTermsForElems
+    std::cout << "InitStressTermsForElems\n";
 #endif
     std::cout << "\n";
 
