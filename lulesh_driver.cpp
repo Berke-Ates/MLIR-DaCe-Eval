@@ -875,6 +875,20 @@ void CalcElemNodeNormals_Extern(double pfx[8],
                                 const double z[8]);
 #endif
 
+#ifdef USE_EXTERNAL_IntegrateStressForElems
+void IntegrateStressForElems_Extern(std::vector<double> &m_x,
+                                    std::vector<double> &m_y,
+                                    std::vector<double> &m_z,
+                                    std::vector<double> &m_fx,
+                                    std::vector<double> &m_fy,
+                                    std::vector<double> &m_fz,
+                                    std::vector<signed int> &m_nodelist,
+                                    unsigned int *m_nodeElemStart,
+                                    unsigned int *m_nodeElemCornerList,
+                                    double *sigxx, double *sigyy, double *sigzz,
+                                    double *determ, signed int numElem, signed int numNode);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -5019,9 +5033,9 @@ static inline void SumElemStressesToNodeForces(const Real_t B[][8],
 
 /******************************************/
 
-static inline void IntegrateStressForElems(Domain &domain,
-                                           Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
-                                           Real_t *determ, Index_t numElem, Index_t numNode)
+static inline void IntegrateStressForElems_Intern(Domain &domain,
+                                                  Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
+                                                  Real_t *determ, Index_t numElem, Index_t numNode)
 {
 #if _OPENMP
   Index_t numthreads = omp_get_max_threads();
@@ -5116,6 +5130,29 @@ static inline void IntegrateStressForElems(Domain &domain,
     Release(&fy_elem);
     Release(&fx_elem);
   }
+}
+
+static inline void IntegrateStressForElems(Domain &domain,
+                                           Real_t *sigxx, Real_t *sigyy, Real_t *sigzz,
+                                           Real_t *determ, Index_t numElem, Index_t numNode)
+{
+#ifdef USE_EXTERNAL_IntegrateStressForElems
+  IntegrateStressForElems_Extern(domain.m_x,
+                                 domain.m_y,
+                                 domain.m_z,
+                                 domain.m_fx,
+                                 domain.m_fy,
+                                 domain.m_fz,
+                                 domain.m_nodelist,
+                                 domain.m_nodeElemStart,
+                                 domain.m_nodeElemCornerList,
+                                 sigxx, sigyy, sigzz,
+                                 determ, numElem, numNode);
+#else
+  IntegrateStressForElems_Intern(domain,
+                                 sigxx, sigyy, sigzz,
+                                 determ, numElem, numNode);
+#endif
 }
 
 /******************************************/
@@ -7405,6 +7442,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CalcElemNodeNormals
     std::cout << "CalcElemNodeNormals\n";
+#endif
+
+#ifdef USE_EXTERNAL_IntegrateStressForElems
+    std::cout << "IntegrateStressForElems\n";
 #endif
     std::cout << "\n";
 
