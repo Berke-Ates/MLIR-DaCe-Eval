@@ -5,22 +5,7 @@
 #include "CalcElemShapeFunctionDerivatives.cpp"
 #include "CalcElemNodeNormals.cpp"
 #include "SumElemStressesToNodeForces.cpp"
-
-template <typename T>
-T *Allocate(size_t size)
-{
-  return static_cast<T *>(malloc(sizeof(T) * size));
-}
-
-template <typename T>
-void Release(T **ptr)
-{
-  if (*ptr != NULL)
-  {
-    free(*ptr);
-    *ptr = NULL;
-  }
-}
+#include "Alloc.cpp"
 
 void IntegrateStressForElems_Extern(std::vector<double> &m_x,
                                     std::vector<double> &m_y,

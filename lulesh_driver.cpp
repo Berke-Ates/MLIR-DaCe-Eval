@@ -889,6 +889,25 @@ void IntegrateStressForElems_Extern(std::vector<double> &m_x,
                                     double *determ, signed int numElem, signed int numNode);
 #endif
 
+#ifdef USE_EXTERNAL_CalcFBHourglassForceForElems
+void CalcFBHourglassForceForElems_Extern(std::vector<signed int> m_nodelist,
+                                         std::vector<double> m_ss,
+                                         std::vector<double> m_elemMass,
+                                         std::vector<double> m_xd,
+                                         std::vector<double> m_yd,
+                                         std::vector<double> m_zd,
+                                         std::vector<double> m_fx,
+                                         std::vector<double> m_fy,
+                                         std::vector<double> m_fz,
+                                         signed int *m_nodeElemStart,
+                                         signed int *m_nodeElemCornerList,
+                                         double *determ,
+                                         double *x8n, double *y8n, double *z8n,
+                                         double *dvdx, double *dvdy, double *dvdz,
+                                         double hourg, signed int numElem,
+                                         signed int numNode);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -5314,13 +5333,13 @@ static inline void CalcElemFBHourglassForce(Real_t *xd, Real_t *yd, Real_t *zd,
 }
 
 /******************************************/
-// NOTE: EXTERN?
-static inline void CalcFBHourglassForceForElems(Domain &domain,
-                                                Real_t *determ,
-                                                Real_t *x8n, Real_t *y8n, Real_t *z8n,
-                                                Real_t *dvdx, Real_t *dvdy, Real_t *dvdz,
-                                                Real_t hourg, Index_t numElem,
-                                                Index_t numNode)
+
+static inline void CalcFBHourglassForceForElems_Intern(Domain &domain,
+                                                       Real_t *determ,
+                                                       Real_t *x8n, Real_t *y8n, Real_t *z8n,
+                                                       Real_t *dvdx, Real_t *dvdy, Real_t *dvdz,
+                                                       Real_t hourg, Index_t numElem,
+                                                       Index_t numNode)
 {
 
 #if _OPENMP
@@ -5600,6 +5619,40 @@ static inline void CalcFBHourglassForceForElems(Domain &domain,
     Release(&fy_elem);
     Release(&fx_elem);
   }
+}
+
+static inline void CalcFBHourglassForceForElems(Domain &domain,
+                                                Real_t *determ,
+                                                Real_t *x8n, Real_t *y8n, Real_t *z8n,
+                                                Real_t *dvdx, Real_t *dvdy, Real_t *dvdz,
+                                                Real_t hourg, Index_t numElem,
+                                                Index_t numNode)
+{
+#ifdef USE_EXTERNAL_CalcFBHourglassForceForElems
+  CalcFBHourglassForceForElems_Extern(domain.m_nodelist,
+                                      domain.m_ss,
+                                      domain.m_elemMass,
+                                      domain.m_xd,
+                                      domain.m_yd,
+                                      domain.m_zd,
+                                      domain.m_fx,
+                                      domain.m_fy,
+                                      domain.m_fz,
+                                      domain.m_nodeElemStart,
+                                      domain.m_nodeElemCornerList,
+                                      determ,
+                                      x8n, y8n, z8n,
+                                      dvdx, dvdy, dvdz,
+                                      hourg, numElem,
+                                      numNode);
+#else
+  CalcFBHourglassForceForElems_Intern(domain,
+                                      determ,
+                                      x8n, y8n, z8n,
+                                      dvdx, dvdy, dvdz,
+                                      hourg, numElem,
+                                      numNode);
+#endif
 }
 
 /******************************************/
@@ -7446,6 +7499,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_IntegrateStressForElems
     std::cout << "IntegrateStressForElems\n";
+#endif
+
+#ifdef USE_EXTERNAL_CalcFBHourglassForceForElems
+    std::cout << "CalcFBHourglassForceForElems\n";
 #endif
     std::cout << "\n";
 
