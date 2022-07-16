@@ -908,6 +908,28 @@ void CalcFBHourglassForceForElems_Extern(std::vector<signed int> &m_nodelist,
                                          signed int numNode);
 #endif
 
+#ifdef USE_EXTERNAL_CalcHourglassControlForElems
+void CalcHourglassControlForElems_Extern(std::vector<double> &m_x,
+                                         std::vector<double> &m_y,
+                                         std::vector<double> &m_z,
+                                         signed int m_numElem,
+                                         std::vector<double> &m_volo,
+                                         std::vector<double> &m_v,
+                                         std::vector<signed int> &m_nodelist,
+                                         std::vector<double> &m_ss,
+                                         std::vector<double> &m_elemMass,
+                                         std::vector<double> &m_xd,
+                                         std::vector<double> &m_yd,
+                                         std::vector<double> &m_zd,
+                                         std::vector<double> &m_fx,
+                                         std::vector<double> &m_fy,
+                                         std::vector<double> &m_fz,
+                                         signed int *m_nodeElemStart,
+                                         signed int *m_nodeElemCornerList,
+                                         signed int m_numNode,
+                                         double determ[], double hgcoef);
+#endif
+
 /********************************lulesh-util.cc********************************/
 
 #include <string.h>
@@ -5656,9 +5678,9 @@ static inline void CalcFBHourglassForceForElems(Domain &domain,
 }
 
 /******************************************/
-// NOTE: EXTERN?
-static inline void CalcHourglassControlForElems(Domain &domain,
-                                                Real_t determ[], Real_t hgcoef)
+
+static inline void CalcHourglassControlForElems_Intern(Domain &domain,
+                                                       Real_t determ[], Real_t hgcoef)
 {
   Index_t numElem = domain.numElem();
   Index_t numElem8 = numElem * 8;
@@ -5722,6 +5744,35 @@ static inline void CalcHourglassControlForElems(Domain &domain,
   Release(&dvdx);
 
   return;
+}
+
+static inline void CalcHourglassControlForElems_Intern(Domain &domain,
+                                                       Real_t determ[], Real_t hgcoef)
+{
+#ifdef USE_EXTERNAL_CalcHourglassControlForElems
+  CalcHourglassControlForElems_Extern(domain.m_x,
+                                      domain.m_y,
+                                      domain.m_z,
+                                      domain.m_numElem,
+                                      domain.m_volo,
+                                      domain.m_v,
+                                      domain.m_nodelist,
+                                      domain.m_ss,
+                                      domain.m_elemMass,
+                                      domain.m_xd,
+                                      domain.m_yd,
+                                      domain.m_zd,
+                                      domain.m_fx,
+                                      domain.m_fy,
+                                      domain.m_fz,
+                                      domain.m_nodeElemStart,
+                                      domain.m_nodeElemCornerList,
+                                      domain.m_numNode,
+                                      Real_t determ[], Real_t hgcoef);
+#else
+  CalcHourglassControlForElems_Intern(Domain & domain,
+                                      Real_t determ[], Real_t hgcoef);
+#endif
 }
 
 /******************************************/
@@ -7503,6 +7554,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CalcFBHourglassForceForElems
     std::cout << "CalcFBHourglassForceForElems\n";
+#endif
+
+#ifdef USE_EXTERNAL_CalcHourglassControlForElems
+    std::cout << "CalcHourglassControlForElems\n";
 #endif
     std::cout << "\n";
 
