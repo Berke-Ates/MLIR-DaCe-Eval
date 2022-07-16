@@ -597,7 +597,7 @@ public:
   MPI_Request sendRequest[26]; // 6 faces + 12 edges + 8 corners
 #endif
 
-private:
+  // private:
   void BuildMesh(Int_t nx, Int_t edgeNodes, Int_t edgeElems);
   void SetupThreadSupportStructures();
   void CreateRegionIndexSets(Int_t nreg, Int_t balance);
@@ -847,6 +847,16 @@ void CalcElemVolumeDerivative_Extern(double dvdx[8],
 void CalcElemFBHourglassForce_Extern(double *xd, double *yd, double *zd,
                                      double hourgam[][4], double coefficient,
                                      double *hgfx, double *hgfy, double *hgfz);
+#endif
+
+#ifdef USE_EXTERNAL_CollectDomainNodesToElemNodes
+void CollectDomainNodesToElemNodes_Extern(std::vector<double> &m_x,
+                                          std::vector<double> &m_y,
+                                          std::vector<double> &m_z,
+                                          const signed int *elemToNode,
+                                          double elemX[8],
+                                          double elemY[8],
+                                          double elemZ[8]);
 #endif
 
 /********************************lulesh-util.cc********************************/
@@ -4606,11 +4616,11 @@ static inline void TimeIncrement(Domain &domain)
 
 /******************************************/
 
-static inline void CollectDomainNodesToElemNodes(Domain &domain,
-                                                 const Index_t *elemToNode,
-                                                 Real_t elemX[8],
-                                                 Real_t elemY[8],
-                                                 Real_t elemZ[8])
+static inline void CollectDomainNodesToElemNodes_Intern(Domain &domain,
+                                                        const Index_t *elemToNode,
+                                                        Real_t elemX[8],
+                                                        Real_t elemY[8],
+                                                        Real_t elemZ[8])
 {
   Index_t nd0i = elemToNode[0];
   Index_t nd1i = elemToNode[1];
@@ -4647,6 +4657,29 @@ static inline void CollectDomainNodesToElemNodes(Domain &domain,
   elemZ[5] = domain.z(nd5i);
   elemZ[6] = domain.z(nd6i);
   elemZ[7] = domain.z(nd7i);
+}
+
+static inline void CollectDomainNodesToElemNodes(Domain &domain,
+                                                 const Index_t *elemToNode,
+                                                 Real_t elemX[8],
+                                                 Real_t elemY[8],
+                                                 Real_t elemZ[8])
+{
+#ifdef USE_EXTERNAL_CollectDomainNodesToElemNodes
+  CollectDomainNodesToElemNodes_Extern(domain.m_x,
+                                       domain.m_y,
+                                       domain.m_z,
+                                       elemToNode,
+                                       elemX,
+                                       elemY,
+                                       elemZ);
+#else
+  CollectDomainNodesToElemNodes_Intern(domain,
+                                       elemToNode,
+                                       elemX,
+                                       elemY,
+                                       elemZ);
+#endif
 }
 
 /******************************************/
@@ -7312,6 +7345,10 @@ int main(int argc, char *argv[])
 
 #ifdef USE_EXTERNAL_CalcElemFBHourglassForce
     std::cout << "CalcElemFBHourglassForce\n";
+#endif
+
+#ifdef USE_EXTERNAL_CollectDomainNodesToElemNodes
+    std::cout << "CollectDomainNodesToElemNodes\n";
 #endif
     std::cout << "\n";
 
