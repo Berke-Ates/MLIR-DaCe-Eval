@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./script.sh [cpp file]
+# Usage: ./run.sh <cpp file>
 
 # Exactly one global text symbol needed in the source file
 
