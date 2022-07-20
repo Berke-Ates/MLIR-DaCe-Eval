@@ -12,6 +12,7 @@ out_dir=./out
 clang=$(which clang)                     || clang="NOT FOUND"
 clangPP=$(which clang++)                 || clangPP="NOT FOUND"
 mlir_opt=$(which mlir-opt)               || mlir_opt="NOT FOUND"
+cf_opt=$(which cf-opt)                 || cf_opt="NOT FOUND"
 mlir_translate=$(which mlir-translate)   || mlir_translate="NOT FOUND"
 cgeist=$(which cgeist)                   || cgeist="NOT FOUND"
 polygeist_opt=$(which polygeist-opt)     || polygeist_opt="NOT FOUND"
@@ -25,6 +26,7 @@ fmt_err="\n❌ %s\n"
 printf "$fmt_start" "clang:" $clang
 printf "$fmt_list" "clang++:" $clangPP
 printf "$fmt_list" "mlir-opt:" $mlir_opt
+printf "$fmt_list" "cf-opt:" $cf_opt
 printf "$fmt_list" "mlir-translate:" $mlir_translate
 printf "$fmt_list" "cgeist:" $cgeist
 printf "$fmt_list" "polygeist-opt:" $polygeist_opt
@@ -39,6 +41,7 @@ set -e # Fail fast
 if [ "$clang" == "NOT FOUND" ] || \
    [ "$clangPP" == "NOT FOUND" ] || \
    [ "$mlir_opt" == "NOT FOUND" ] || \
+   [ "$cf_opt" == "NOT FOUND" ] || \
    [ "$mlir_translate" == "NOT FOUND" ] || \
    [ "$cgeist" == "NOT FOUND" ] || \
    [ "$polygeist_opt" == "NOT FOUND" ]|| \
@@ -96,8 +99,16 @@ if grep -q -i "scf" $out_dir/$src_name.mlir; then
   printf "$fmt_list" "Lowered:" "SCF"
 fi
 
+
+
 # Lower cf
 if grep -q -i "cf" $out_dir/$src_name.mlir; then
+  # Workaround for https://github.com/llvm/llvm-project/issues/55301
+  $cf_opt --cf-index-to-int --allow-unregistered-dialect \
+      $out_dir/$src_name.mlir > $out_dir/$src_name\_cf_fix.mlir
+  cp $out_dir/$src_name\_cf_fix.mlir $out_dir/$src_name.mlir
+  printf "$fmt_list" "Applied Workaround"
+
   $mlir_opt --convert-cf-to-llvm --allow-unregistered-dialect \
      $out_dir/$src_name.mlir > $out_dir/$src_name\_cf.mlir
   cp $out_dir/$src_name\_cf.mlir $out_dir/$src_name.mlir

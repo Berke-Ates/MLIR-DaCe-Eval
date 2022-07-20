@@ -5770,8 +5770,8 @@ static inline void CalcHourglassControlForElems_Intern(Domain &domain,
   return;
 }
 
-static inline void CalcHourglassControlForElems_Intern(Domain &domain,
-                                                       Real_t determ[], Real_t hgcoef)
+static inline void CalcHourglassControlForElems(Domain &domain,
+                                                Real_t determ[], Real_t hgcoef)
 {
 #ifdef USE_EXTERNAL_CalcHourglassControlForElems
   CalcHourglassControlForElems_Extern(domain.m_x,
@@ -5792,10 +5792,9 @@ static inline void CalcHourglassControlForElems_Intern(Domain &domain,
                                       domain.m_nodeElemStart,
                                       domain.m_nodeElemCornerList,
                                       domain.m_numNode,
-                                      Real_t determ[], Real_t hgcoef);
+                                      determ, hgcoef);
 #else
-  CalcHourglassControlForElems_Intern(Domain & domain,
-                                      Real_t determ[], Real_t hgcoef);
+  CalcHourglassControlForElems_Intern(domain, determ, hgcoef);
 #endif
 }
 
