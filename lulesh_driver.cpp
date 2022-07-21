@@ -883,8 +883,8 @@ void IntegrateStressForElems_Extern(std::vector<double> &m_x,
                                     std::vector<double> &m_fy,
                                     std::vector<double> &m_fz,
                                     std::vector<signed int> &m_nodelist,
-                                    unsigned int *m_nodeElemStart,
-                                    unsigned int *m_nodeElemCornerList,
+                                    signed int *m_nodeElemStart,
+                                    signed int *m_nodeElemCornerList,
                                     double *sigxx, double *sigyy, double *sigzz,
                                     double *determ, signed int numElem, signed int numNode);
 #endif
