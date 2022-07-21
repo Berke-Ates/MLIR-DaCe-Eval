@@ -4,10 +4,7 @@
 #include "CalcElemFBHourglassForce.cpp"
 #include "Alloc.cpp"
 
-// Probably only need one of those
-inline float CBRT(float arg) { return cbrtf(arg); }
 inline double CBRT(double arg) { return cbrt(arg); }
-inline long double CBRT(long double arg) { return cbrtl(arg); }
 
 void CalcFBHourglassForceForElems_Extern(std::vector<signed int> &m_nodelist,
                                          std::vector<double> &m_ss,
