@@ -99,8 +99,6 @@ if grep -q -i "scf" $out_dir/$src_name.mlir; then
   printf "$fmt_list" "Lowered:" "SCF"
 fi
 
-
-
 # Lower cf
 if grep -q -i "cf" $out_dir/$src_name.mlir; then
   # Workaround for https://github.com/llvm/llvm-project/issues/55301
@@ -128,6 +126,8 @@ $mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llv
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
+## TODO: Rename all interfaces with a loop
+
 # Rename interface
 # Unsure if needed
 # if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
@@ -136,6 +136,22 @@ printf "$fmt_list" "Lowered to:" "LLVM"
 #   sed -i -e "s/_mlir_ciface_/$mangled_name/g" $out_dir/$src_name.mlir
 #   printf "$fmt_list" "Renamed Interface"
 # fi
+
+# Rename cbrt interface
+if grep -q -i "_mlir_ciface_cbrt" $out_dir/$src_name.mlir; then
+  sed -i -e "s/_mlir_ciface_cbrt/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
+  sed -i -e "s/cbrt/cbrt_renamed/g" $out_dir/$src_name.mlir
+  sed -i -e "s/_mlir_ciface_tmp/cbrt/g" $out_dir/$src_name.mlir
+  printf "$fmt_list" "Renamed Interface:" "cbrt"
+fi
+
+# Rename exit interface
+if grep -q -i "_mlir_ciface_exit" $out_dir/$src_name.mlir; then
+  sed -i -e "s/_mlir_ciface_exit/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
+  sed -i -e "s/exit/exit_renamed/g" $out_dir/$src_name.mlir
+  sed -i -e "s/_mlir_ciface_tmp/exit/g" $out_dir/$src_name.mlir
+  printf "$fmt_list" "Renamed Interface:" "exit"
+fi
 
 # Translate
 $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
