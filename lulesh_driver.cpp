@@ -5802,9 +5802,6 @@ static inline void CalcHourglassControlForElems(Domain &domain,
 
 static inline void CalcVolumeForceForElems_Intern(Domain &domain)
 {
-#ifdef USE_EXTERNAL_CALCS
-  CalcVolumeForceForElems_Extern(domain);
-#else
   Index_t numElem = domain.numElem();
   if (numElem != 0)
   {
@@ -5844,7 +5841,6 @@ static inline void CalcVolumeForceForElems_Intern(Domain &domain)
     Release(&sigyy);
     Release(&sigxx);
   }
-#endif // USE_EXTERNAL_CALCS
 }
 
 static inline void CalcVolumeForceForElems(Domain &domain)
