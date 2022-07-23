@@ -1,29 +1,27 @@
-#include <vector>
-
 #include "InitStressTermsForElems.cpp"
 #include "IntegrateStressForElems.cpp"
 #include "CalcHourglassControlForElems.cpp"
 #include "Alloc.cpp"
 
-void CalcVolumeForceForElems_Extern(std::vector<double> &m_p,
-                                    std::vector<double> &m_q,
-                                    std::vector<double> &m_x,
-                                    std::vector<double> &m_y,
-                                    std::vector<double> &m_z,
-                                    std::vector<double> &m_fx,
-                                    std::vector<double> &m_fy,
-                                    std::vector<double> &m_fz,
-                                    std::vector<signed int> &m_nodelist,
+void CalcVolumeForceForElems_Extern(double *m_p,
+                                    double *m_q,
+                                    double *m_x,
+                                    double *m_y,
+                                    double *m_z,
+                                    double *m_fx,
+                                    double *m_fy,
+                                    double *m_fz,
+                                    signed int *m_nodelist,
                                     signed int *m_nodeElemStart,
                                     signed int *m_nodeElemCornerList,
                                     signed int m_numElem,
-                                    std::vector<double> &m_volo,
-                                    std::vector<double> &m_v,
-                                    std::vector<double> &m_ss,
-                                    std::vector<double> &m_elemMass,
-                                    std::vector<double> &m_xd,
-                                    std::vector<double> &m_yd,
-                                    std::vector<double> &m_zd,
+                                    double *m_volo,
+                                    double *m_v,
+                                    double *m_ss,
+                                    double *m_elemMass,
+                                    double *m_xd,
+                                    double *m_yd,
+                                    double *m_zd,
                                     signed int m_numNode,
                                     double m_hgcoef)
 {

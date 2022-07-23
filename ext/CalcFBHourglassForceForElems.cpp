@@ -1,4 +1,3 @@
-#include <vector>
 #include <math.h>
 
 #include "CalcElemFBHourglassForce.cpp"
@@ -6,15 +5,15 @@
 
 inline double CBRT(double arg) { return cbrt(arg); }
 
-void CalcFBHourglassForceForElems_Extern(std::vector<signed int> &m_nodelist,
-                                         std::vector<double> &m_ss,
-                                         std::vector<double> &m_elemMass,
-                                         std::vector<double> &m_xd,
-                                         std::vector<double> &m_yd,
-                                         std::vector<double> &m_zd,
-                                         std::vector<double> &m_fx,
-                                         std::vector<double> &m_fy,
-                                         std::vector<double> &m_fz,
+void CalcFBHourglassForceForElems_Extern(signed int *m_nodelist,
+                                         double *m_ss,
+                                         double *m_elemMass,
+                                         double *m_xd,
+                                         double *m_yd,
+                                         double *m_zd,
+                                         double *m_fx,
+                                         double *m_fy,
+                                         double *m_fz,
                                          signed int *m_nodeElemStart,
                                          signed int *m_nodeElemCornerList,
                                          double *determ,

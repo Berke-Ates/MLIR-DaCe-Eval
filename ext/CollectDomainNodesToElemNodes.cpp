@@ -1,11 +1,9 @@
 #ifndef EXTERNAL_COLLECTDOMAINNODESTOELEMNODES
 #define EXTERNAL_COLLECTDOMAINNODESTOELEMNODES
 
-#include <vector>
-
-void CollectDomainNodesToElemNodes_Extern(std::vector<double> &m_x,
-                                          std::vector<double> &m_y,
-                                          std::vector<double> &m_z,
+void CollectDomainNodesToElemNodes_Extern(double *m_x,
+                                          double *m_y,
+                                          double *m_z,
                                           const signed int *elemToNode,
                                           double elemX[8],
                                           double elemY[8],

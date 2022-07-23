@@ -1,7 +1,5 @@
-#include <vector>
-
-void InitStressTermsForElems_Extern(std::vector<double> &m_p,
-                                    std::vector<double> &m_q,
+void InitStressTermsForElems_Extern(double *m_p,
+                                    double *m_q,
                                     double *sigxx, double *sigyy, double *sigzz,
                                     signed int numElem)
 {

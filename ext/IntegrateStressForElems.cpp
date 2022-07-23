@@ -1,4 +1,3 @@
-#include <vector>
 #include <stdlib.h>
 
 #include "CollectDomainNodesToElemNodes.cpp"
@@ -7,13 +6,13 @@
 #include "SumElemStressesToNodeForces.cpp"
 #include "Alloc.cpp"
 
-void IntegrateStressForElems_Extern(std::vector<double> &m_x,
-                                    std::vector<double> &m_y,
-                                    std::vector<double> &m_z,
-                                    std::vector<double> &m_fx,
-                                    std::vector<double> &m_fy,
-                                    std::vector<double> &m_fz,
-                                    std::vector<signed int> &m_nodelist,
+void IntegrateStressForElems_Extern(double *m_x,
+                                    double *m_y,
+                                    double *m_z,
+                                    double *m_fx,
+                                    double *m_fy,
+                                    double *m_fz,
+                                    signed int *m_nodelist,
                                     signed int *m_nodeElemStart,
                                     signed int *m_nodeElemCornerList,
                                     double *sigxx, double *sigyy, double *sigzz,
