@@ -26,8 +26,10 @@ cmake -G Ninja ../llvm \
   functions provided the `-DUSE_EXTERNAL_<function>` flag
 - `calcs.cpp` contains the extracted calc functions in their unaltered state 
    (just for reference)
-- `ext/` contains all the functions in their altered form
+- `ext/` contains all the functions in their altered form (the main calculating
+function is: `ext/CalcVolumeForceForElems`)
 - `run.sh ext/<function>.cpp` compiles the provided function using Polygeist,
 links with the driver (settings the `-DUSE_EXTERNAL_<function>` flag), runs the
 result and checks with `normal_output.txt` for correctness
+
 
