@@ -1,15 +1,20 @@
 #include <stdlib.h>
 
-char main()
+int main()
 {
-  char *A = malloc(sizeof(char));
-  char *B = malloc(sizeof(char));
+  int *A = (int *)malloc(2147483647 * sizeof(int));
+  int *B = (int *)malloc(2147483647 * sizeof(int));
+  int *C = (int *)malloc(2147483647 * sizeof(int));
 
-  for (char i = 0; i < 10000000; ++i)
+  for (int i1 = 0; i1 < 2147483647; ++i1)
   {
-    *A = 5;
-    *B = i;
+    A[i1] += 5;
   }
 
-  return *A;
+  for (int i2 = 0; i2 < A[0]; ++i2)
+  {
+    B[0] = 5;
+  }
+
+  return B[0];
 }

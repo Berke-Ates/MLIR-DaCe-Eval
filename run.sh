@@ -83,6 +83,12 @@ $cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
 cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
 printf "$fmt_start" "Lowered to:" "MLIR"
 
+# Generate straight translation
+$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
+  -S --memref-fullrank -$opt_lvl -DUSE_MPI=0 \
+  --raise-scf-to-affine $src > $out_dir/$src_name\_cgeist_nopt.mlir
+printf "$fmt_start" "Generated non-opt-version"
+
 # Lower affine 
 if grep -q -i "affine" $out_dir/$src_name.mlir; then
   $mlir_opt --lower-affine --allow-unregistered-dialect \
