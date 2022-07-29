@@ -4,7 +4,6 @@ int main()
 {
   int *A = (int *)malloc(2147483647 * sizeof(int));
   int *B = (int *)malloc(2147483647 * sizeof(int));
-  int *C = (int *)malloc(2147483647 * sizeof(int));
 
   for (int i1 = 0; i1 < 2147483647; ++i1)
   {
