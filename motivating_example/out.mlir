@@ -3,17 +3,19 @@ module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<"dlti.endianness"
     %c5_i32 = arith.constant 5 : i32
     %0 = memref.alloc() : memref<2147483647xi32>
     %1 = memref.alloc() : memref<2147483647xi32>
+    %2 = memref.alloc() : memref<2147483647xi32>
     affine.for %arg0 = 0 to 2147483647 {
-      %5 = affine.load %0[%arg0] : memref<2147483647xi32>
-      %6 = arith.addi %5, %c5_i32 : i32
-      affine.store %6, %0[%arg0] : memref<2147483647xi32>
+      affine.store %c5_i32, %0[%arg0] : memref<2147483647xi32>
+      %6 = affine.load %2[%arg0] : memref<2147483647xi32>
+      %7 = arith.addi %6, %c5_i32 : i32
+      affine.store %7, %2[%arg0] : memref<2147483647xi32>
     }
-    %2 = affine.load %0[0] : memref<2147483647xi32>
-    %3 = arith.index_cast %2 : i32 to index
-    affine.for %arg0 = 0 to %3 {
+    %3 = affine.load %0[0] : memref<2147483647xi32>
+    %4 = arith.index_cast %3 : i32 to index
+    affine.for %arg0 = 0 to %4 {
       affine.store %c5_i32, %1[0] : memref<2147483647xi32>
     }
-    %4 = affine.load %1[0] : memref<2147483647xi32>
-    return %4 : i32
+    %5 = affine.load %1[0] : memref<2147483647xi32>
+    return %5 : i32
   }
 }
