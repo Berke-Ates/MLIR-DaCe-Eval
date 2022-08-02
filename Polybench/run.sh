@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Usage: ./run.sh <cpp file>
-
-# Exactly one global text symbol needed in the source file
+# Usage: ./run.sh <benchmark>
 
 # Settings
-driver=lulesh_driver.cpp
+util_folder=./benchmarks/utilities
+driver=./benchmarks/utilities/polybench.c
+flags="-DSMALL_DATASET -DPOLYBENCH_TIME"
 opt_lvl=O0
 out_dir=./out
 
@@ -33,7 +33,6 @@ printf "$fmt_list" "polygeist-opt:" $polygeist_opt
 printf "$fmt_list" "llc:" $llc
 printf "$fmt_list" "output dir:" $out_dir
 printf "$fmt_list" "opt lvl:" $opt_lvl
-
 
 set -e # Fail fast
 
@@ -71,23 +70,31 @@ fi
 printf "$fmt_list" "Using compiler:" "$(basename ${compiler%.*})"
 
 # Find mangled name
-$compiler -c $src -DUSE_MPI=0 -o $out_dir/$src_name.o
+$compiler -c -I $util_folder $src -o $out_dir/$src_name.o
 mangled_name=$(nm $out_dir/$src_name.o | grep $src_name | cut -d ' ' -f3)
 rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
+# Interface renaming function
+rename_interface(){
+  sed -i -e "s/_mlir_ciface_$1/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
+  sed -i -e "s/$1/$1_renamed/g" $out_dir/$src_name.mlir
+  sed -i -e "s/_mlir_ciface_tmp/$1/g" $out_dir/$src_name.mlir
+  printf "$fmt_list" "$1"
+}
+
 # Generate straight translation
-$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
-  -S --memref-fullrank -$opt_lvl -DUSE_MPI=0 \
-  --raise-scf-to-affine $src > $out_dir/$src_name\_cgeist_nopt.mlir
+$cgeist -resource-dir=$(clang -print-resource-dir) -I $util_folder \
+  -function=$mangled_name -S --memref-fullrank -$opt_lvl --raise-scf-to-affine \
+  $src > $out_dir/$src_name\_cgeist_nopt.mlir
 printf "$fmt_start" "Generated:" "non-opt-version"
 
 # Polygeist c/cpp -> mlir
-$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
-  -S --memref-fullrank --memref-abi=0 --struct-abi=0 -$opt_lvl -DUSE_MPI=0 \
-  --raise-scf-to-affine $src > $out_dir/$src_name.mlir
+$cgeist -resource-dir=$(clang -print-resource-dir) -I $util_folder \
+  -S --memref-fullrank -$opt_lvl --raise-scf-to-affine $flags \
+  --memref-abi=0 --struct-abi=0 $src > $out_dir/$src_name.mlir
 cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
-printf "$fmt_start" "Lowered to:" "MLIR"
+printf "$fmt_list" "Lowered to:" "MLIR"
 
 # Lower affine 
 if grep -q -i "affine" $out_dir/$src_name.mlir; then
@@ -132,14 +139,6 @@ $mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llv
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
-# Interface renaming function
-rename_interface(){
-  sed -i -e "s/_mlir_ciface_$1/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
-  sed -i -e "s/$1/$1_renamed/g" $out_dir/$src_name.mlir
-  sed -i -e "s/_mlir_ciface_tmp/$1/g" $out_dir/$src_name.mlir
-  printf "$fmt_list" "$1"
-}
-
 # Rename interface
 if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
   printf "$fmt_start_nl" "Renamed Interfaces:"
@@ -160,25 +159,15 @@ $llc -$opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_nam
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clangPP -c -g -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
-printf "$fmt_list" "Assembled using:" "Clang++"
+$compiler -c -g -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
+printf "$fmt_list" "Assembled using:" "$(basename ${compiler%.*})"
 
 # Link
-$clangPP $driver $out_dir/$src_name.o \
-  -g -$opt_lvl -o $out_dir/$src_name.out -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
+$compiler $driver $out_dir/$src_name.o $flags \
+  -g -$opt_lvl -o $out_dir/$src_name.out
 printf "$fmt_list" "Linked with:" $driver
 
 # Execute
 printf "$fmt_start_nl" "Executing:" "$out_dir/$src_name.out"
 res=$(./$out_dir/$src_name.out)
 printf "\n%s\n" "$res"
-
-# Check for correctness
-expected=$(grep -A8 "Run completed" normal_output.txt)
-actual=$(echo "$res" | grep -A8 "Run completed")
-
-if [[ "$actual" == "$expected" ]]; then
-printf "$fmt_start_nl" "Output correct"
-else
-printf "$fmt_err" "Wrong output"
-fi
