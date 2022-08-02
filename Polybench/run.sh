@@ -5,8 +5,8 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DSMALL_DATASET -DPOLYBENCH_TIME"
-opt_lvl=O0
+flags="-DMEDIUM_DATASET -DPOLYBENCH_DUMP_ARRAYS"
+opt_lvl=O3
 out_dir=./out
 
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -75,17 +75,9 @@ mangled_name=$(nm $out_dir/$src_name.o | grep $src_name | cut -d ' ' -f3)
 rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
-# Interface renaming function
-rename_interface(){
-  sed -i -e "s/_mlir_ciface_$1/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
-  sed -i -e "s/$1/$1_renamed/g" $out_dir/$src_name.mlir
-  sed -i -e "s/_mlir_ciface_tmp/$1/g" $out_dir/$src_name.mlir
-  printf "$fmt_list" "$1"
-}
-
 # Generate straight translation
 $cgeist -resource-dir=$(clang -print-resource-dir) -I $util_folder \
-  -function=$mangled_name -S --memref-fullrank -$opt_lvl --raise-scf-to-affine \
+  -S --memref-fullrank -$opt_lvl --raise-scf-to-affine $flags \
   $src > $out_dir/$src_name\_cgeist_nopt.mlir
 printf "$fmt_start" "Generated:" "non-opt-version"
 
@@ -139,6 +131,14 @@ $mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llv
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
+# Interface renaming function
+rename_interface(){
+  sed -i -e "s/_mlir_ciface_$1/_mlir_ciface_tmp/g" $out_dir/$src_name.mlir
+  sed -i -e "s/$1/$1_renamed/g" $out_dir/$src_name.mlir
+  sed -i -e "s/_mlir_ciface_tmp/$1/g" $out_dir/$src_name.mlir
+  printf "$fmt_list" "$1"
+}
+
 # Rename interface
 if grep -q -i "_mlir_ciface_" $out_dir/$src_name.mlir; then
   printf "$fmt_start_nl" "Renamed Interfaces:"
@@ -169,5 +169,16 @@ printf "$fmt_list" "Linked with:" $driver
 
 # Execute
 printf "$fmt_start_nl" "Executing:" "$out_dir/$src_name.out"
-res=$(./$out_dir/$src_name.out)
-printf "\n%s\n" "$res"
+actual=$(./$out_dir/$src_name.out 2>&1)
+printf "\n%s\n" "$actual"
+
+# Compare output
+$compiler -I $util_folder $driver $src $flags -$opt_lvl \
+  -o $out_dir/$src_name\_compare.out
+expected=$(./$out_dir/$src_name\_compare.out 2>&1)
+
+if [[ "$actual" == "$expected" ]]; then
+  printf "$fmt_start_nl" "Output correct"
+else
+  printf "$fmt_err" "Wrong output"
+fi
