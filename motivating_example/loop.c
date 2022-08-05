@@ -2,19 +2,17 @@
 
 int main()
 {
-  int *A = (int *)malloc(2147483647 * sizeof(int));
-  int *B = (int *)malloc(2147483647 * sizeof(int));
-  int *C = (int *)malloc(2147483647 * sizeof(int));
+  int *A = (int *)malloc(2147483645 * sizeof(int));
+  int *B = (int *)malloc(2147483645 * sizeof(int));
 
-  for (int i1 = 0; i1 < 2147483647; ++i1)
+  for (int i = 0; i < 2147483645; ++i)
   {
-    A[i1] = 5;
-    C[i1] += 5;
-  }
+    A[i] = 5;
 
-  for (int i2 = 0; i2 < A[0]; ++i2)
-  {
-    B[0] = 5;
+    for (int j = 0; j < 2147483645; ++j)
+    {
+      B[j] = A[i];
+    }
   }
 
   return B[0];

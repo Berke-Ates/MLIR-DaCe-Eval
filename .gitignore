@@ -3,3 +3,6 @@
 
 # Output folders
 **/out/
+
+# DaCe cache
+**/.dacecache
