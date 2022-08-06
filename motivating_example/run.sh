@@ -135,7 +135,7 @@ sleep 10
 
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gcc.out
 done
 
@@ -144,7 +144,7 @@ sleep 30
 
 printf "$fmt_list" "Running:" "G++"
 echo -e "\n--- G++ ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gpp.out
 done
 
@@ -153,7 +153,7 @@ sleep 30
 
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clang.out
 done
 
@@ -162,7 +162,7 @@ sleep 30
 
 printf "$fmt_list" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clangpp.out
 done
 
@@ -171,7 +171,7 @@ sleep 30
 
 printf "$fmt_list" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_mlir.out
 done
 
@@ -180,7 +180,7 @@ sleep 30
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   timeout $max_time $python run.py $out_dir/$src_name\_opt.sdfg >> $timings
 done
 
@@ -189,6 +189,6 @@ sleep 30
 
 printf "$fmt_list" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
-for i in {1..$repetitions}; do
+for i in $(seq 1 $repetitions); do
   timeout $max_time $python run.py $out_dir/$src_name\_noopt.sdfg >> $timings
 done
