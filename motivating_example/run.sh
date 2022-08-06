@@ -5,6 +5,8 @@
 # Settings
 opt_lvl=O3
 out_dir=./out
+max_time=20s
+repetitions=10
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -88,51 +90,19 @@ $cgeist -resource-dir=$($clang -print-resource-dir) \
   -S --memref-fullrank -$opt_lvl --raise-scf-to-affine $1 | \
 $mlir_opt --affine-loop-invariant-code-motion | $mlir_opt --affine-scalrep | \
 $mlir_opt --lower-affine | $mlir_opt --cse > $out_dir/$src_name\_opt.mlir
-
 printf "$fmt_list" "Generated:" "Optimized MLIR"
 
 $cgeist -resource-dir=$($clang -print-resource-dir) \
   -S --memref-fullrank -O0 $1 | \
 $mlir_opt --lower-affine > $out_dir/$src_name\_noopt.mlir
-
 printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
-# Lower through MLIR
-cp $out_dir/$src_name\_opt.mlir $out_dir/$src_name.mlir
-
-# Lower affine 
-if grep -q -i "affine" $out_dir/$src_name.mlir; then
-  $mlir_opt --lower-affine \
-    $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
-  cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "Affine"
-fi
-
-# Lower scf 
-if grep -q -i "scf" $out_dir/$src_name.mlir; then
-  $mlir_opt --convert-scf-to-cf \
-     $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
-  cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "SCF"
-fi
-
-# Lower cf
-if grep -q -i "cf" $out_dir/$src_name.mlir; then
-  # Workaround for https://github.com/llvm/llvm-project/issues/55301
-  $cf_opt --cf-index-to-int \
-      $out_dir/$src_name.mlir > $out_dir/$src_name\_cf_fix.mlir
-  cp $out_dir/$src_name\_cf_fix.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Applied Workaround"
-
-  $mlir_opt --convert-cf-to-llvm \
-     $out_dir/$src_name.mlir > $out_dir/$src_name\_cf.mlir
-  cp $out_dir/$src_name\_cf.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "CF"
-fi
+### Lower through MLIR ###
 
 # Lower to llvm 
-$mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llvm.mlir
-cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
+$mlir_opt --convert-scf-to-cf --convert-func-to-llvm --convert-cf-to-llvm \
+  --lower-host-to-llvm --reconcile-unrealized-casts \
+  $out_dir/$src_name\_opt.mlir > $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
 # Translate
@@ -140,43 +110,85 @@ $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_list" "Translated to:" "LLVMIR"
 
 # Compile
-$llc -$opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
+$llc -$opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
 $clang -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
 printf "$fmt_list" "Assembled using:" "Clang"
 
+# Compile SDFG
+$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir \
+| $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
+printf "$fmt_list" "Compiled:" "Optimized SDFG"
+
+$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
+| $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_noopt.sdfg
+printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
+
 # Run benchmark
 timings=$out_dir/timings.txt
 touch $timings
 
+printf "$fmt_list" "Waiting for GC"
+sleep 10
+
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
-\time -a -o $timings $out_dir/$src_name\_gcc.out
+for i in {1..$repetitions}; do
+  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gcc.out
+done
+
+printf "$fmt_list" "Waiting for GC"
+sleep 30
 
 printf "$fmt_list" "Running:" "G++"
-echo -e "\n--- GPP ---" >> $timings
-\time -a -o $timings $out_dir/$src_name\_gpp.out
+echo -e "\n--- G++ ---" >> $timings
+for i in {1..$repetitions}; do
+  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gpp.out
+done
+
+printf "$fmt_list" "Waiting for GC"
+sleep 30
 
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
-\time -a -o $timings $out_dir/$src_name\_clang.out
+for i in {1..$repetitions}; do
+  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clang.out
+done
+
+printf "$fmt_list" "Waiting for GC"
+sleep 30
 
 printf "$fmt_list" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
-\time -a -o $timings $out_dir/$src_name\_clangpp.out
+for i in {1..$repetitions}; do
+  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clangpp.out
+done
+
+printf "$fmt_list" "Waiting for GC"
+sleep 30
 
 printf "$fmt_list" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
-\time -a -o $timings $out_dir/$src_name\_mlir.out
+for i in {1..$repetitions}; do
+  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_mlir.out
+done
 
-printf "$fmt_list" "Running:" "SDFG Non-Opt"
-echo -e "\n--- SDFG NOOPT ---" >> $timings
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
-| $sdfg_translate --mlir-to-sdfg | $python opt.py >> $timings
+printf "$fmt_list" "Waiting for GC"
+sleep 30
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir \
-| $sdfg_translate --mlir-to-sdfg | $python opt.py >> $timings
+for i in {1..$repetitions}; do
+  timeout $max_time $python run.py $out_dir/$src_name\_opt.sdfg >> $timings
+done
+
+printf "$fmt_list" "Waiting for GC"
+sleep 30
+
+printf "$fmt_list" "Running:" "SDFG Non-Opt"
+echo -e "\n--- SDFG NOOPT ---" >> $timings
+for i in {1..$repetitions}; do
+  timeout $max_time $python run.py $out_dir/$src_name\_noopt.sdfg >> $timings
+done
