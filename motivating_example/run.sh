@@ -5,8 +5,8 @@
 # Settings
 opt_lvl=O3
 out_dir=./out
-max_time=20s
-repetitions=10
+max_time=70s
+repetitions=12
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
