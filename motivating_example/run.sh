@@ -5,7 +5,7 @@
 # Settings
 opt_lvl=O3
 out_dir=./out
-max_time=70s
+max_time=10m
 repetitions=12
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"

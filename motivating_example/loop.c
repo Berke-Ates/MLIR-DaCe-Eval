@@ -2,16 +2,20 @@
 
 int main()
 {
-  int *A = (int *)malloc(2147483647 * sizeof(int)); // ~ 8GB of memory
-  int *B = (int *)malloc(21 * sizeof(int));
+  int *A = (int *)malloc(1000000000 * sizeof(int));
+  int *B = (int *)malloc(1000000000 * sizeof(int));
 
-  for (int i = 0; i < 2147483647; ++i)
+  for (int i = 0; i < 1000000000; ++i)
   {
     A[i] = 5;
 
-    for (int j = 0; j < 21; ++j)
+    for (int j = 0; j < 1000000000; ++j)
     {
       B[j] = A[i];
+    }
+
+    for (int j = 0; j < 1000; ++j)
+    {
       A[j] = A[i];
     }
   }
