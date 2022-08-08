@@ -1,10 +1,17 @@
 import sys
-from dace import SDFG
 import time
+import dace
 
-sdfg = SDFG.from_file(sys.argv[1])
+# To check the output incomment all the comments and change the data container
+# in the sdfg from scalar to array
+
+sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
+# A = dace.scalar(dtype=dace.int32)
 
 start_time = time.time()
-obj()
+obj(
+    #_arg0=A
+)
 print("%.2f" % (time.time() - start_time))
+#print("res: %s" % A)
