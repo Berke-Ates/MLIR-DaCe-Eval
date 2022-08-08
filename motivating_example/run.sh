@@ -5,8 +5,8 @@
 # Settings
 opt_lvl=O3
 out_dir=./out
-max_time=30m
-repetitions=1
+max_time=1m
+repetitions=12
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -131,52 +131,62 @@ timings=$out_dir/timings.txt
 touch $timings
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep 5
 
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gcc.out
+  ts=$(date +%s%N)
+  timeout $max_time $out_dir/$src_name\_gcc.out
+  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "G++"
 echo -e "\n--- G++ ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_gpp.out
+  ts=$(date +%s%N)
+  timeout $max_time $out_dir/$src_name\_gpp.out
+  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clang.out
+  ts=$(date +%s%N)
+  timeout $max_time $out_dir/$src_name\_clang.out
+  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_clangpp.out
+  ts=$(date +%s%N)
+  timeout $max_time $out_dir/$src_name\_clangpp.out
+  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  \time --quiet -a -f'%e' -o $timings timeout $max_time $out_dir/$src_name\_mlir.out
+  ts=$(date +%s%N)
+  timeout $max_time $out_dir/$src_name\_mlir.out
+  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
@@ -185,7 +195,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 30
+sleep 10
 
 printf "$fmt_list" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings

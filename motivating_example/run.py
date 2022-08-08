@@ -1,4 +1,7 @@
 import sys
+
+# sys.path.insert(0, "/home/xdb/dace")
+
 import time
 import dace
 
@@ -13,5 +16,6 @@ start_time = time.time()
 obj(
     #_arg0=A
 )
-print("%.2f" % (time.time() - start_time))
+elapsed = int((time.time() - start_time) * 1000)
+print("%d" % elapsed)
 #print("res: %s" % A)

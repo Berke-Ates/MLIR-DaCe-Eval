@@ -14,7 +14,7 @@ def add_median_labels(ax, precision='.1f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 75,
+                       y + 300,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -34,7 +34,7 @@ plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
-ax.set(ylabel='runtime (s)')
+ax.set(ylabel='runtime (ms)')
 ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
 
 add_median_labels(ax)
