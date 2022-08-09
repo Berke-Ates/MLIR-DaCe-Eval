@@ -3,7 +3,7 @@
 # Usage: ./run.sh <cpp file>
 
 # Settings
-opt_lvl=O3
+opt_lvl=-O3
 out_dir=./out
 max_time=1m
 repetitions=12
@@ -13,9 +13,9 @@ gpp=$(which g++)                         || gpp="NOT FOUND"
 clang=$(which clang)                     || clang="NOT FOUND"
 clangpp=$(which clang++)                 || clangpp="NOT FOUND"
 cgeist=$(which cgeist)                   || cgeist="NOT FOUND"
+polygeist_opt=$(which polygeist-opt)     || polygeist_opt="NOT FOUND"
 mlir_opt=$(which mlir-opt)               || mlir_opt="NOT FOUND"
 mlir_translate=$(which mlir-translate)   || mlir_translate="NOT FOUND"
-cf_opt=$(which cf-opt)                   || cf_opt="NOT FOUND"
 sdfg_opt=$(which sdfg-opt)               || sdfg_opt="NOT FOUND"
 sdfg_translate=$(which sdfg-translate)   || sdfg_translate="NOT FOUND"
 python=$(which python3)                  || python="NOT FOUND"
@@ -31,9 +31,9 @@ printf "$fmt_list" "g++:" $gpp
 printf "$fmt_list" "clang:" $clang
 printf "$fmt_list" "clang++:" $clangpp
 printf "$fmt_list" "cgeist:" $cgeist
+printf "$fmt_list" "polygeist-opt:" $polygeist_opt
 printf "$fmt_list" "mlir-opt:" $mlir_opt
 printf "$fmt_list" "mlir-translate:" $mlir_translate
-printf "$fmt_list" "cf-opt:" $cf_opt
 printf "$fmt_list" "sdfg-opt:" $sdfg_opt
 printf "$fmt_list" "sdfg-translate:" $sdfg_translate
 printf "$fmt_list" "python:" $python
@@ -47,9 +47,9 @@ if [ "$gcc" == "NOT FOUND" ] || \
    [ "$clang" == "NOT FOUND" ] || \
    [ "$clangpp" == "NOT FOUND" ] || \
    [ "$cgeist" == "NOT FOUND" ] || \
+   [ "$polygeist_opt" == "NOT FOUND" ]|| \
    [ "$mlir_opt" == "NOT FOUND" ] || \
    [ "$mlir_translate" == "NOT FOUND" ] || \
-   [ "$cf_opt" == "NOT FOUND" ] || \
    [ "$sdfg_opt" == "NOT FOUND" ] || \
    [ "$sdfg_translate" == "NOT FOUND" ] || \
    [ "$python" == "NOT FOUND" ] || \
@@ -76,24 +76,24 @@ src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
-$gcc -$opt_lvl -o $out_dir/$src_name\_gcc.out $src
+$gcc $opt_lvl -o $out_dir/$src_name\_gcc.out $src
 printf "$fmt_list" "Generated:" "GCC"
-$gpp -$opt_lvl -o $out_dir/$src_name\_gpp.out $src
+$gpp $opt_lvl -o $out_dir/$src_name\_gpp.out $src
 printf "$fmt_list" "Generated:" "G++"
-$clang -$opt_lvl -o $out_dir/$src_name\_clang.out $src
+$clang $opt_lvl -o $out_dir/$src_name\_clang.out $src
 printf "$fmt_list" "Generated:" "Clang"
-$clangpp -$opt_lvl -o $out_dir/$src_name\_clangpp.out $src &> /dev/null
+$clangpp $opt_lvl -o $out_dir/$src_name\_clangpp.out $src &> /dev/null
 printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate mlir
 $cgeist -resource-dir=$($clang -print-resource-dir) \
-  -S --memref-fullrank -$opt_lvl --raise-scf-to-affine $1 | \
+  -S --memref-fullrank $opt_lvl --raise-scf-to-affine $src | \
 $mlir_opt --affine-loop-invariant-code-motion | $mlir_opt --affine-scalrep | \
 $mlir_opt --lower-affine | $mlir_opt --cse > $out_dir/$src_name\_opt.mlir
 printf "$fmt_list" "Generated:" "Optimized MLIR"
 
 $cgeist -resource-dir=$($clang -print-resource-dir) \
-  -S --memref-fullrank -O0 $1 | \
+  -S --memref-fullrank -O0 $src | \
 $mlir_opt --lower-affine > $out_dir/$src_name\_noopt.mlir
 printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
@@ -110,11 +110,11 @@ $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_list" "Translated to:" "LLVMIR"
 
 # Compile
-$llc -$opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
+$llc $opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
+$clang $opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG

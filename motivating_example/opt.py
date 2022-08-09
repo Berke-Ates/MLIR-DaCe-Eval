@@ -10,7 +10,7 @@ from dace.transformation.passes.dead_dataflow_elimination import DeadDataflowEli
 from dace.transformation.passes.constant_propagation import ConstantPropagation
 from dace import SDFG
 
-print("Using DaCe from: %s" % dace.__file__)
+print("   Using DaCe from: %s" % dace.__file__)
 
 sdfg = SDFG.from_json(json.load(sys.stdin))
 sdfg.validate()
