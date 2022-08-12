@@ -7,6 +7,7 @@ opt_lvl=-O3
 out_dir=./out
 max_time=1m
 repetitions=12
+gc_time=10
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -131,7 +132,7 @@ timings=$out_dir/timings.txt
 touch $timings
 
 printf "$fmt_list" "Waiting for GC"
-sleep 5
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
@@ -142,7 +143,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "G++"
 echo -e "\n--- G++ ---" >> $timings
@@ -153,7 +154,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
@@ -164,7 +165,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
@@ -175,7 +176,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
@@ -186,7 +187,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
@@ -195,7 +196,7 @@ for i in $(seq 1 $repetitions); do
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
