@@ -74,7 +74,7 @@
 
 #ifdef DATA_TYPE_IS_DOUBLE
 #define DATA_TYPE double
-#define DATA_PRINTF_MODIFIER "%0.3lf "
+#define DATA_PRINTF_MODIFIER "%0.4lf "
 #define SCALAR_VAL(x) x
 #define SQRT_FUN(x) sqrt(x)
 #define EXP_FUN(x) exp(x)

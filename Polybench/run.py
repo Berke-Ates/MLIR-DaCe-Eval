@@ -14,7 +14,7 @@ def printArray(arr, offset, depth):
     else:
         if offset % 20 == 0:
             print("", file=sys.stderr)
-        print("%.3f " % arr, end='', file=sys.stderr)
+        print("%.4f " % arr, end='', file=sys.stderr)
 
 
 # def print1DArray(arr):

@@ -154,7 +154,7 @@ printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
 # Run benchmark
 timings=$out_dir/timings.txt
 touch $timings
-expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning)")
+expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -163,7 +163,7 @@ printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_gcc.out 2>&1 | grep -ivwE "(begin|end|warning)")
+  actual=$(./$out_dir/$src_name\_gcc.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
   if [[ "$actual" == "$expected" ]]; then
@@ -181,7 +181,7 @@ printf "$fmt_start_nl" "Running:" "G++"
 echo -e "\n--- G++ ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning)")
+  actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
   if [[ "$actual" == "$expected" ]]; then
@@ -199,7 +199,7 @@ printf "$fmt_start_nl" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning)")
+  actual=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
   if [[ "$actual" == "$expected" ]]; then
@@ -217,7 +217,7 @@ printf "$fmt_start_nl" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning)")
+  actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
   if [[ "$actual" == "$expected" ]]; then
@@ -235,7 +235,7 @@ printf "$fmt_start_nl" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_mlir.out 2>&1 | grep -ivwE "(begin|end|warning)")
+  actual=$(./$out_dir/$src_name\_mlir.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
   if [[ "$actual" == "$expected" ]]; then
@@ -253,7 +253,7 @@ printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
   $python run.py $out_dir/$src_name\_opt.sdfg 2> .dump_opt.tmp >> $timings
-  actual=$(grep -ivwE "(begin|end|warning)" .dump_opt.tmp)
+  actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
   rm .dump_opt.tmp
 
   if [[ "$actual" == "$expected" ]]; then
@@ -271,7 +271,7 @@ printf "$fmt_start_nl" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
   $python run.py $out_dir/$src_name\_noopt.sdfg 2> .dump_noopt.tmp >> $timings
-  actual=$(grep -ivwE "(begin|end|warning)" .dump_noopt.tmp)
+  actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_noopt.tmp | sed "s/-0.000/0.000/g")
   rm .dump_noopt.tmp
 
   if [[ "$actual" == "$expected" ]]; then
