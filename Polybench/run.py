@@ -6,47 +6,46 @@ import time
 import dace
 
 
-def print1DArray(arr):
-    elemCnt = 0
-    for elem in arr:
-        if elemCnt % 20 == 0:
+def printArray(arr, offset, depth):
+    if (depth > 0):
+        for dimIdx, dim in enumerate(arr):
+            offsetFac = len(arr) if depth > 1 else 1
+            printArray(dim, offsetFac * (offset + dimIdx), depth - 1)
+    else:
+        if offset % 20 == 0:
             print("", file=sys.stderr)
-        print("%.2f " % elem, end='', file=sys.stderr)
-        elemCnt = elemCnt + 1
+        print("%.3f " % arr, end='', file=sys.stderr)
 
 
-def print2DArray(arr):
-    elemCnt = 0
-    for row in arr:
-        for elem in row:
-            if elemCnt % 20 == 0:
-                print("", file=sys.stderr)
-            print("%.2f " % elem, end='', file=sys.stderr)
-            elemCnt = elemCnt + 1
+# def print1DArray(arr):
+#     for elemIdx, elem in enumerate(arr):
+#         if elemIdx % 20 == 0:
+#             print("", file=sys.stderr)
+#         printDouble(elem)
 
+# def print2DArray(arr):
+#     for rowIdx, row in enumerate(arr):
+#         for elemIdx, elem in enumerate(row):
+#             if (rowIdx * len(arr) + elemIdx) % 20 == 0:
+#                 print("", file=sys.stderr)
+#             printDouble(elem)
 
-def print3DArray(arr):
-    elemCnt = 0
-    for row in arr:
-        for col in row:
-            for elem in col:
-                if elemCnt % 20 == 0:
-                    print("", file=sys.stderr)
-                print("%.2f " % elem, end='', file=sys.stderr)
-                elemCnt = elemCnt + 1
-
+# def print3DArray(arr):
+#     for rowIdx, row in enumerate(arr):
+#         for colIdx, col in enumerate(row):
+#             for elemIdx, elem in enumerate(col):
+#                 if (rowIdx * len(row) * len(arr) + colIdx * len(row) +
+#                         elemIdx) % 20 == 0:
+#                     print("", file=sys.stderr)
+#                 printDouble(elem)
 
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
 
-args = []
-argNames = []
 argDict = {}
 
 for argName, argType in sdfg.arglist().items():
     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
-    args.append(arr)
-    argNames.append(argName)
     argDict[argName] = arr
 
 start_time = time.time()
@@ -54,19 +53,11 @@ obj(**argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 
-for i in range(len(args)):
-    print("begin dump: %s" % argNames[i], end='', file=sys.stderr)
-    if len(args[i].shape) == 1:
-        print1DArray(args[i])
-
-    if len(args[i].shape) == 2:
-        print2DArray(args[i])
-
-    if len(args[i].shape) == 3:
-        print3DArray(args[i])
-    print("\nend   dump: %s" % argNames[i], file=sys.stderr)
+for argName, arr in argDict.items():
+    print("begin dump: %s" % argName, end='', file=sys.stderr)
+    printArray(arr, 0, len(arr.shape))
+    print("\nend   dump: %s" % argName, file=sys.stderr)
 
 print("==END   DUMP_ARRAYS==", file=sys.stderr)
 
-elapsed = int((time.time() - start_time) * 1000)
-print("%d" % elapsed)
+print("%d" % int((time.time() - start_time) * 1000))

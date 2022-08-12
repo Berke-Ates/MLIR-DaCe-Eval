@@ -5,10 +5,11 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DMEDIUM_DATASET -DPOLYBENCH_DUMP_ARRAYS"
+flags="-DMINI_DATASET -DPOLYBENCH_DUMP_ARRAYS"
 opt_lvl=-O3
 out_dir=./out
 repetitions=1
+gc_time=0
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -78,11 +79,11 @@ src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
-$gcc -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src $driver
+$gcc -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src $driver -lm
 printf "$fmt_list" "Generated:" "GCC"
 $gpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gpp.out $src $driver
 printf "$fmt_list" "Generated:" "G++"
-$clang -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src $driver
+$clang -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src $driver -lm
 printf "$fmt_list" "Generated:" "Clang"
 $clangpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src $driver &> /dev/null
 printf "$fmt_list" "Generated:" "Clang++"
@@ -90,11 +91,11 @@ printf "$fmt_list" "Generated:" "Clang++"
 # Generate mlir
 
 # Generate straight translation
-$cgeist -resource-dir=$(clang -print-resource-dir) -I $util_folder \
+$cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
   -S --memref-fullrank $opt_lvl --raise-scf-to-affine $flags $src | \
 $mlir_opt --affine-loop-invariant-code-motion | $mlir_opt --affine-scalrep | \
 $mlir_opt --lower-affine | $mlir_opt --cse > $out_dir/$src_name\_opt.mlir
-printf "$fmt_start" "Generated:" "Optimized MLIR"
+printf "$fmt_list" "Generated:" "Optimized MLIR"
 
 # Polygeist c/cpp -> mlir
 $cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
@@ -106,7 +107,7 @@ printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
 # Lower to llvm 
 $mlir_opt --convert-scf-to-cf --convert-func-to-llvm --convert-cf-to-llvm \
-  --lower-host-to-llvm --reconcile-unrealized-casts \
+  --convert-math-to-llvm --lower-host-to-llvm --reconcile-unrealized-casts \
   $out_dir/$src_name\_opt.mlir > $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
@@ -138,7 +139,7 @@ $llc $opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $flags $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.out
+$clang $opt_lvl $flags $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.out -lm
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
@@ -156,7 +157,7 @@ touch $timings
 expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning)")
 
 printf "$fmt_list" "Waiting for GC"
-sleep 5
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
@@ -169,11 +170,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "G++"
 echo -e "\n--- G++ ---" >> $timings
@@ -186,11 +188,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
@@ -203,11 +206,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "Clang++"
 echo -e "\n--- Clang++ ---" >> $timings
@@ -220,11 +224,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
@@ -237,11 +242,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
@@ -254,11 +260,12 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i: Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
 printf "$fmt_list" "Waiting for GC"
-sleep 10
+sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
@@ -271,6 +278,7 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i: Incorrect!"
+    echo "Incorrect!" >> $timings
   fi
 done
 
