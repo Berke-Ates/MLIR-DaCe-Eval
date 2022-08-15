@@ -20,5 +20,9 @@ int main()
     }
   }
 
-  return B[0];
+  int res = B[0];
+  free(A);
+  free(B);
+
+  return res;
 }
