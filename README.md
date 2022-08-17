@@ -1,5 +1,5 @@
 # MLIR-DaCe Evaluation
-This is a repository to evaluate MLIR-SDFG on multiple benchmarks.
+This is a repository to evaluate MLIR-DaCe on multiple benchmarks.
 
 ## Folders
 - `LULESH` contains the LULESH benchmark
