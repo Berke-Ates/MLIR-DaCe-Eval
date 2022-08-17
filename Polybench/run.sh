@@ -5,7 +5,7 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DMINI_DATASET -DPOLYBENCH_DUMP_ARRAYS"
+flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS"
 opt_lvl=-O3
 out_dir=./out
 repetitions=1
@@ -92,16 +92,16 @@ printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate straight translation
 $cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
+  -S --memref-fullrank -O0 $flags $src | \
+$mlir_opt --lower-affine --inline > $out_dir/$src_name\_noopt.mlir
+printf "$fmt_list" "Generated:" "Non-optimized MLIR"
+
+# Polygeist c/cpp -> mlir
+$cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
   -S --memref-fullrank $opt_lvl --raise-scf-to-affine $flags $src | \
 $mlir_opt --affine-loop-invariant-code-motion | $mlir_opt --affine-scalrep | \
 $mlir_opt --lower-affine | $mlir_opt --cse > $out_dir/$src_name\_opt.mlir
 printf "$fmt_list" "Generated:" "Optimized MLIR"
-
-# Polygeist c/cpp -> mlir
-$cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
-  -S --memref-fullrank -O0 $flags $src | \
-$mlir_opt --lower-affine --inline > $out_dir/$src_name\_noopt.mlir
-printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
 ### Lower through MLIR ###
 
