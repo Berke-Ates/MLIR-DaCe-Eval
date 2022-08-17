@@ -1,4 +1,4 @@
-# MLIR-SDFG Evaluation
+# MLIR-DaCe Evaluation
 This is a repository to evaluate MLIR-SDFG on multiple benchmarks.
 
 ## Folders
