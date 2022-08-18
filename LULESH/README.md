@@ -24,8 +24,7 @@ cmake -G Ninja ../llvm \
 - `normal_output.txt` contains the output of a regular run
 - `lulesh_driver.cpp` is a modified LULESH benchmark, which uses external 
   functions provided the `-DUSE_EXTERNAL_<function>` flag
-- `calcs.cpp` contains the extracted calc functions in their unaltered state 
-   (just for reference)
+- `CalcVolumeForceForElems.cpp` is the altered main calculating function
 - `ext/` contains all the functions in their altered form (the main calculating
 function is: `ext/CalcVolumeForceForElems`)
 - `run.sh ext/<function>.cpp` compiles the provided function using Polygeist,
