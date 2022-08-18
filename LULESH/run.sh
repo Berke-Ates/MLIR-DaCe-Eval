@@ -6,7 +6,7 @@
 
 # Settings
 driver=lulesh_driver.cpp
-opt_lvl=O0
+opt_lvl=-O3
 out_dir=./out
 
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -77,47 +77,23 @@ rm $out_dir/$src_name.o
 printf "$fmt_list\n" "Function name:" "$mangled_name"
 
 # Generate straight translation
-$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
-  -S --memref-fullrank -$opt_lvl -DUSE_MPI=0 \
-  --raise-scf-to-affine $src > $out_dir/$src_name\_cgeist_nopt.mlir
-printf "$fmt_start" "Generated:" "non-opt-version"
+$cgeist -resource-dir=$($clang -print-resource-dir) -function=$mangled_name \
+  -S --memref-fullrank -O0 -DUSE_MPI=0 $src | \
+$mlir_opt --allow-unregistered-dialect --lower-affine \
+  > $out_dir/$src_name\_noopt.mlir
+printf "$fmt_start" "Generated:" "Non-optimized MLIR"
 
 # Polygeist c/cpp -> mlir
-$cgeist -resource-dir=$(clang -print-resource-dir) -function=$mangled_name \
-  -S --memref-fullrank --memref-abi=0 --struct-abi=0 -$opt_lvl -DUSE_MPI=0 \
-  --raise-scf-to-affine $src > $out_dir/$src_name.mlir
-cp $out_dir/$src_name.mlir $out_dir/$src_name\_cgeist.mlir
-printf "$fmt_start" "Lowered to:" "MLIR"
-
-# Lower affine 
-if grep -q -i "affine" $out_dir/$src_name.mlir; then
-  $mlir_opt --lower-affine --allow-unregistered-dialect \
-    $out_dir/$src_name.mlir > $out_dir/$src_name\_affine.mlir
-  cp $out_dir/$src_name\_affine.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "Affine"
-fi
-
-# Lower scf 
-if grep -q -i "scf" $out_dir/$src_name.mlir; then
-  $mlir_opt --convert-scf-to-cf --allow-unregistered-dialect \
-     $out_dir/$src_name.mlir > $out_dir/$src_name\_scf.mlir
-  cp $out_dir/$src_name\_scf.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "SCF"
-fi
-
-# Lower cf
-if grep -q -i "cf" $out_dir/$src_name.mlir; then
-  # Workaround for https://github.com/llvm/llvm-project/issues/55301
-  $cf_opt --cf-index-to-int --allow-unregistered-dialect \
-      $out_dir/$src_name.mlir > $out_dir/$src_name\_cf_fix.mlir
-  cp $out_dir/$src_name\_cf_fix.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Applied:" "Workaround"
-
-  $mlir_opt --convert-cf-to-llvm --allow-unregistered-dialect \
-     $out_dir/$src_name.mlir > $out_dir/$src_name\_cf.mlir
-  cp $out_dir/$src_name\_cf.mlir $out_dir/$src_name.mlir
-  printf "$fmt_list" "Lowered:" "CF"
-fi
+$cgeist -resource-dir=$($clang -print-resource-dir) -function=$mangled_name \
+  -S --memref-fullrank --memref-abi=0 $opt_lvl -DUSE_MPI=0 \
+  --raise-scf-to-affine $src | \
+# $mlir_opt --allow-unregistered-dialect --affine-loop-invariant-code-motion | \
+# $mlir_opt --allow-unregistered-dialect --affine-scalrep | \
+$mlir_opt --allow-unregistered-dialect --lower-affine | \
+$mlir_opt --allow-unregistered-dialect --cse --inline \
+  > $out_dir/$src_name\_opt.mlir
+cp $out_dir/$src_name\_opt.mlir $out_dir/$src_name.mlir
+printf "$fmt_list" "Generated:" "Optimized MLIR"
 
 # Lower Polygeist
 if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
@@ -128,7 +104,9 @@ if grep -q -i "polygeist" $out_dir/$src_name.mlir; then
 fi
 
 # Lower to llvm 
-$mlir_opt --lower-host-to-llvm $out_dir/$src_name.mlir > $out_dir/$src_name\_llvm.mlir
+$mlir_opt --convert-scf-to-cf --convert-func-to-llvm --convert-cf-to-llvm \
+  --convert-math-to-llvm --lower-host-to-llvm --reconcile-unrealized-casts \
+  $out_dir/$src_name.mlir > $out_dir/$src_name\_llvm.mlir
 cp $out_dir/$src_name\_llvm.mlir $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
@@ -156,16 +134,16 @@ $mlir_translate --mlir-to-llvmir $out_dir/$src_name.mlir > $out_dir/$src_name.ll
 printf "$fmt_start_nl" "Translated to:" "LLVMIR"
 
 # Compile
-$llc -$opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
+$llc $opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clangPP -c -g -$opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
+$clangPP -c -g $opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name.o
 printf "$fmt_list" "Assembled using:" "Clang++"
 
 # Link
 $clangPP $driver $out_dir/$src_name.o \
-  -g -$opt_lvl -o $out_dir/$src_name.out -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
+  -g $opt_lvl -o $out_dir/$src_name.out -DUSE_MPI=0 -DUSE_EXTERNAL_$src_name
 printf "$fmt_list" "Linked with:" $driver
 
 # Execute
