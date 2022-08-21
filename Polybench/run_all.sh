@@ -5,6 +5,7 @@
 # Settings
 out_dir=./timings
 result_dir=./out
+repetitions=11
 
 # Create output directory
 if [ ! -d $out_dir ]; then
@@ -34,8 +35,10 @@ for filename in $benchmarks; do
     echo -ne "\033[2K\r"
     echo -ne "$prog ($percent%) ($bname)"
 
-    ./run.sh $filename &> /dev/null
+    ./run.sh $filename $repetitions &> /dev/null
     cp $result_dir/timings.txt $out_dir/$bname.txt
+
+    ./plot.sh $out_dir/$bname.txt $repetitions &> /dev/null
 done
 
 echo ""

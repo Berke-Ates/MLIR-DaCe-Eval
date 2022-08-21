@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./run.sh <benchmark>
+# Usage: ./run.sh <benchmark> <repetitions>
 
 # Settings
 util_folder=./benchmarks/utilities
@@ -8,8 +8,8 @@ driver=./benchmarks/utilities/polybench.c
 flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS"
 opt_lvl=-O3
 out_dir=./out
-repetitions=1
-gc_time=0
+repetitions=$2
+gc_time=10
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -92,7 +92,7 @@ printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate straight translation
 $cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
-  -S --memref-fullrank -O0 $flags $src | \
+  -S --memref-fullrank -O1 $flags $src | \
 $mlir_opt --lower-affine > $out_dir/$src_name\_noopt.mlir
 printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
