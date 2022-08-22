@@ -28,16 +28,34 @@ def add_median_labels(ax, precision='.1f'):
         ])
 
 
+def change_width(ax, new_value):
+    for patch in ax.patches:
+        current_width = patch.get_width()
+        diff = current_width - new_value
+
+        # we change the bar width
+        patch.set_width(new_value)
+
+        # we recenter the bar
+        patch.set_x(patch.get_x() + diff * .5)
+
+
 dt = pd.read_csv(sys.argv[1])
 sns.set(style="darkgrid")
+sns.set(font_scale=1.5)
 
-plt.figure(figsize=(8, 4))
-box_plot = sns.boxplot(data=dt, notch=True)
+plt.figure(figsize=(3, 5))
+color = ['green', 'green', 'green', 'green', 'green', 'red']
+box_plot = sns.barplot(data=dt, palette=color, ci=None)
 
 ax = box_plot.axes
-ax.set(ylabel='runtime (ms)')
-ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+ax.set_title(sys.argv[3])
+#ax.set(ylabel='runtime (ms)')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="right")
+# ax.set(xticklabels=[])
 
-add_median_labels(ax)
+# add_median_labels(ax)
+# change_width(ax, .5)
+
 plt.tight_layout()
-plt.savefig(sys.argv[2], dpi=300)
+plt.savefig(sys.argv[2], dpi=300, bbox_inches='tight')
