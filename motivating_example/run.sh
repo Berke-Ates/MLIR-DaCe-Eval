@@ -189,6 +189,9 @@ done
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
 
+export DACE_compiler_cpu_openmp_sections=0
+export DACE_compiler_inline_sdfgs=1
+
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do

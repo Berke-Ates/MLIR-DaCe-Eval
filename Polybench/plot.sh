@@ -3,8 +3,9 @@
 # Usage: ./plot.sh <txt timings file> <repetitions>
 
 # Settings
-labels=("GCC" "G++" "Clang" "Clang++" "MLIR" "SDFG (Opt)" "SDFG (No Opt)")
+labels=("GCC" "G++" "Clang" "Clang++" "MLIR" "SDFG")
 repetitions=$2
+timings_dir=./timings
 out_dir=./plots
 
 # Create output directory
@@ -15,7 +16,7 @@ fi
 src=$1
 src_name=$(basename ${src%.*})
 
-timings=$out_dir/$src_name.csv
+timings=$timings_dir/$src_name.csv
 rm $timings
 touch $timings
 

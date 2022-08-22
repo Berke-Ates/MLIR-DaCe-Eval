@@ -5,7 +5,7 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS"
+flags="-DEXTRALARGE_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS"
 opt_lvl=-O3
 out_dir=./out
 repetitions=$2
@@ -92,7 +92,7 @@ printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate straight translation
 $cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
-  -S --memref-fullrank -O1 $flags $src | \
+  -S --memref-fullrank -O0 $flags $src | \
 $mlir_opt --lower-affine > $out_dir/$src_name\_noopt.mlir
 printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
@@ -150,9 +150,9 @@ $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir \
 | $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
 
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
-| $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_noopt.sdfg
-printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
+# $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
+# | $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_noopt.sdfg
+# printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
 
 # Run benchmark
 timings=$out_dir/timings.txt
@@ -255,6 +255,9 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
+  export DACE_compiler_cpu_openmp_sections=0
+  export DACE_compiler_inline_sdfgs=1
+
   $python run.py $out_dir/$src_name\_opt.sdfg 2> .dump_opt.tmp >> $timings
   actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
   rm .dump_opt.tmp
@@ -263,25 +266,25 @@ for i in $(seq 1 $repetitions); do
     printf "$fmt_list" "Output $i:" "Correct"
   else
     printf "$fmt_err" "Output $i: Incorrect!"
-    echo "Incorrect!" >> $timings
+    # echo "Incorrect!" >> $timings
   fi
 done
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "SDFG Non-Opt"
-echo -e "\n--- SDFG NOOPT ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $python run.py $out_dir/$src_name\_noopt.sdfg 2> .dump_noopt.tmp >> $timings
-  actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_noopt.tmp | sed "s/-0.000/0.000/g")
-  rm .dump_noopt.tmp
+# printf "$fmt_start_nl" "Running:" "SDFG Non-Opt"
+# echo -e "\n--- SDFG NOOPT ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $python run.py $out_dir/$src_name\_noopt.sdfg 2> .dump_noopt.tmp >> $timings
+#   actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_noopt.tmp | sed "s/-0.000/0.000/g")
+#   rm .dump_noopt.tmp
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i: Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
-done
+#   if [[ "$actual" == "$expected" ]]; then
+#     printf "$fmt_list" "Output $i:" "Correct"
+#   else
+#     printf "$fmt_err" "Output $i: Incorrect!"
+#     # echo "Incorrect!" >> $timings
+#   fi
+# done
 

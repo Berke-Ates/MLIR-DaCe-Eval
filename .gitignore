@@ -4,5 +4,11 @@
 # Output folders
 **/out/
 
+# Timings folders
+**/timings/
+
+# Plot folders
+**/plots/
+
 # DaCe cache
 **/.dacecache
