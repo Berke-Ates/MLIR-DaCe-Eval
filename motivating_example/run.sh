@@ -9,6 +9,9 @@ max_time=1m
 repetitions=12
 gc_time=10
 
+export DACE_compiler_cpu_openmp_sections=0
+export DACE_compiler_inline_sdfgs=1
+
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -188,9 +191,6 @@ done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
-
-export DACE_compiler_cpu_openmp_sections=0
-export DACE_compiler_inline_sdfgs=1
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings

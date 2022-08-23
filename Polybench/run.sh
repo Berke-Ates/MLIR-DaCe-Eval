@@ -11,6 +11,9 @@ out_dir=./out
 repetitions=$2
 gc_time=10
 
+export DACE_compiler_cpu_openmp_sections=0
+export DACE_compiler_inline_sdfgs=1
+
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -255,9 +258,6 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  export DACE_compiler_cpu_openmp_sections=0
-  export DACE_compiler_inline_sdfgs=1
-
   $python run.py $out_dir/$src_name\_opt.sdfg 2> .dump_opt.tmp >> $timings
   actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
   rm .dump_opt.tmp
