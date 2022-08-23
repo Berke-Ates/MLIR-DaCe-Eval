@@ -17,28 +17,36 @@ benchmarks=$(find benchmarks/* -name '*.c' -not -path "benchmarks/utilities/*")
 total=$(echo "$benchmarks" | wc -l)
 count=0
 
+skip=true
+
 for filename in $benchmarks; do
     bname="$(basename $filename .c)"
     count=$((count+1))
     diff=$(($total - $count))
     percent=$(($count * 100 / $total))
 
-    prog=''
-    for i in $(seq 1 $count); do
-      prog="$prog#"
-    done
+    if [ "$bname" = "heat-3d" ]; then
+      skip=false
+    fi
 
-    for i in $(seq 1 $diff); do
-      prog="$prog-"
-    done
+    if [ "$skip" != true ] ; then
+      prog=''
+      for i in $(seq 1 $count); do
+        prog="$prog#"
+      done
 
-    echo -ne "\033[2K\r"
-    echo -ne "$prog ($percent%) ($bname)"
+      for i in $(seq 1 $diff); do
+        prog="$prog-"
+      done
 
-    ./run.sh $filename $repetitions &> /dev/null
-    cp $result_dir/timings.txt $out_dir/$bname.txt
+      echo -ne "\033[2K\r"
+      echo -ne "$prog ($percent%) ($bname)"
 
-    ./plot.sh $out_dir/$bname.txt $repetitions &> /dev/null
+      ./run.sh $filename $repetitions &> /dev/null
+      cp $result_dir/timings.txt $out_dir/$bname.txt
+
+      ./plot.sh $out_dir/$bname.txt $repetitions &> /dev/null
+    fi
 done
 
 echo ""
