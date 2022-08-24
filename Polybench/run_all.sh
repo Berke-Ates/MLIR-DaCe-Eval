@@ -17,7 +17,7 @@ benchmarks=$(find benchmarks/* -name '*.c' -not -path "benchmarks/utilities/*")
 total=$(echo "$benchmarks" | wc -l)
 count=0
 
-skip=true
+skip=false
 
 for filename in $benchmarks; do
     bname="$(basename $filename .c)"

@@ -4,6 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 
+yLabel = {"2mm", "floyd-warshall", "symm"}
+noXLabel = {
+    "2mm", "3mm", "adi", "atax", "bicg", "cholesky", "correlation",
+    "covariance", "deriche", "doitgen", "durbin", "fdtd-2d"
+}
+
 
 def add_median_labels(ax, precision='.1f'):
     lines = ax.get_lines()
@@ -44,15 +50,30 @@ dt = pd.read_csv(sys.argv[1])
 sns.set(style="darkgrid")
 sns.set(font_scale=1.5)
 
-plt.figure(figsize=(3, 5))
+xSize = 3
+ySize = 5
+
+# if sys.argv[3] in yLabel:
+#     xSize = 3.5
+
+# if sys.argv[3] in noXLabel:
+#     ySize = 4.5
+
+plt.figure(figsize=(xSize, ySize))
+
 color = ['green', 'green', 'green', 'green', 'green', 'red']
 box_plot = sns.barplot(data=dt, palette=color, ci=None)
 
 ax = box_plot.axes
 ax.set_title(sys.argv[3])
-#ax.set(ylabel='runtime (ms)')
-ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="right")
-# ax.set(xticklabels=[])
+
+if sys.argv[3] in yLabel:
+    ax.set(ylabel='runtime (ms)')
+
+if sys.argv[3] in noXLabel:
+    ax.set(xticklabels=[])
+
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
 # add_median_labels(ax)
 # change_width(ax, .5)
