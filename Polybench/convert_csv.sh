@@ -44,5 +44,3 @@ for i in $(seq 1 $repetitions); do
 
   echo -ne "\n" >> $timings
 done
-
-python3 plot.py $timings $out_dir/$src_name.pdf $src_name

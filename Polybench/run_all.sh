@@ -45,7 +45,7 @@ for filename in $benchmarks; do
       ./run.sh $filename $repetitions &> /dev/null
       cp $result_dir/timings.txt $out_dir/$bname.txt
 
-      ./plot.sh $out_dir/$bname.txt $repetitions &> /dev/null
+      ./convert_csv.sh $out_dir/$bname.txt $repetitions &> /dev/null
     fi
 done
 
