@@ -14,7 +14,7 @@ def add_median_labels(ax, precision='.1f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 300,
+                       y + 100,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -39,4 +39,4 @@ ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
 
 add_median_labels(ax)
 plt.tight_layout()
-plt.savefig('plot.pdf', dpi=300)
+plt.savefig('plot.pdf', dpi=300, bbox_inches='tight')
