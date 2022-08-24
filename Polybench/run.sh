@@ -160,7 +160,7 @@ printf "$fmt_list" "Compiled:" "Optimized SDFG"
 # Run benchmark
 timings=$out_dir/timings.txt
 touch $timings
-expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+# expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -172,12 +172,12 @@ for i in $(seq 1 $repetitions); do
   actual=$(./$out_dir/$src_name\_gcc.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i:" "Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i:" "Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -190,12 +190,12 @@ for i in $(seq 1 $repetitions); do
   actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i:" "Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i:" "Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -208,12 +208,12 @@ for i in $(seq 1 $repetitions); do
   actual=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i:" "Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i:" "Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -226,12 +226,12 @@ for i in $(seq 1 $repetitions); do
   actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i:" "Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i:" "Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -244,12 +244,12 @@ for i in $(seq 1 $repetitions); do
   actual=$(./$out_dir/$src_name\_mlir.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i:" "Incorrect!"
-    echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i:" "Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -259,15 +259,15 @@ printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
   $python run.py $out_dir/$src_name\_opt.sdfg 2> .dump_opt.tmp >> $timings
-  actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
+  # actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
   rm .dump_opt.tmp
 
-  if [[ "$actual" == "$expected" ]]; then
-    printf "$fmt_list" "Output $i:" "Correct"
-  else
-    printf "$fmt_err" "Output $i: Incorrect!"
-    # echo "Incorrect!" >> $timings
-  fi
+  # if [[ "$actual" == "$expected" ]]; then
+  #   printf "$fmt_list" "Output $i:" "Correct"
+  # else
+  #   printf "$fmt_err" "Output $i: Incorrect!"
+  #   echo "Incorrect!" >> $timings
+  # fi
 done
 
 # printf "$fmt_list" "Waiting for GC"
