@@ -12,3 +12,6 @@
 
 # DaCe cache
 **/.dacecache
+
+# DaCe graphs
+**/_dacegraphs
