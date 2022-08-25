@@ -29,6 +29,7 @@ def add_median_labels(ax, precision='.1f'):
 
 dt = pd.read_csv("timings.csv")
 sns.set(style="darkgrid")
+sns.set(font_scale=1.5)
 
 plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
