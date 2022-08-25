@@ -5,14 +5,15 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DLARGE_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS"
-opt_lvl=-O3
+flags="-DLARGE_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS -fPIC -O2 -march=native"
+opt_lvl=-O2
 out_dir=./out
 repetitions=$2
 gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_inline_sdfgs=1
+export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -180,23 +181,23 @@ for i in $(seq 1 $repetitions); do
   # fi
 done
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "G++"
-echo -e "\n--- G++ ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+# printf "$fmt_start_nl" "Running:" "G++"
+# echo -e "\n--- G++ ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ts=$(date +%s%N)
+#   actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i:" "Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
-done
+#   # if [[ "$actual" == "$expected" ]]; then
+#   #   printf "$fmt_list" "Output $i:" "Correct"
+#   # else
+#   #   printf "$fmt_err" "Output $i:" "Incorrect!"
+#   #   echo "Incorrect!" >> $timings
+#   # fi
+# done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -216,23 +217,23 @@ for i in $(seq 1 $repetitions); do
   # fi
 done
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "Clang++"
-echo -e "\n--- Clang++ ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+# printf "$fmt_start_nl" "Running:" "Clang++"
+# echo -e "\n--- Clang++ ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ts=$(date +%s%N)
+#   actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i:" "Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
-done
+#   # if [[ "$actual" == "$expected" ]]; then
+#   #   printf "$fmt_list" "Output $i:" "Correct"
+#   # else
+#   #   printf "$fmt_err" "Output $i:" "Incorrect!"
+#   #   echo "Incorrect!" >> $timings
+#   # fi
+# done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
