@@ -3,6 +3,7 @@
 # Usage: ./run.sh <cpp file>
 
 # Settings
+flags="-fPIC -march=native"
 opt_lvl=-O3
 out_dir=./out
 max_time=1m
@@ -11,6 +12,7 @@ gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_inline_sdfgs=1
+export DACE_compiler_cpu_args="-fPIC -O3 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -80,13 +82,13 @@ src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
-$gcc $opt_lvl -o $out_dir/$src_name\_gcc.out $src
+$gcc $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src
 printf "$fmt_list" "Generated:" "GCC"
-$gpp $opt_lvl -o $out_dir/$src_name\_gpp.out $src
+$gpp $opt_lvl $flags -o $out_dir/$src_name\_gpp.out $src
 printf "$fmt_list" "Generated:" "G++"
-$clang $opt_lvl -o $out_dir/$src_name\_clang.out $src
+$clang $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src
 printf "$fmt_list" "Generated:" "Clang"
-$clangpp $opt_lvl -o $out_dir/$src_name\_clangpp.out $src &> /dev/null
+$clangpp $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src &> /dev/null
 printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate mlir
@@ -118,7 +120,7 @@ $llc $opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
+$clang $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
@@ -145,16 +147,16 @@ for i in $(seq 1 $repetitions); do
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_list" "Running:" "G++"
-echo -e "\n--- G++ ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  timeout $max_time $out_dir/$src_name\_gpp.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-done
+# printf "$fmt_list" "Running:" "G++"
+# echo -e "\n--- G++ ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ts=$(date +%s%N)
+#   timeout $max_time $out_dir/$src_name\_gpp.out
+#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+# done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -167,16 +169,16 @@ for i in $(seq 1 $repetitions); do
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 done
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_list" "Running:" "Clang++"
-echo -e "\n--- Clang++ ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  timeout $max_time $out_dir/$src_name\_clangpp.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-done
+# printf "$fmt_list" "Running:" "Clang++"
+# echo -e "\n--- Clang++ ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ts=$(date +%s%N)
+#   timeout $max_time $out_dir/$src_name\_clangpp.out
+#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+# done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time

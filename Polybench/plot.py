@@ -61,8 +61,8 @@ ySize = 5
 
 plt.figure(figsize=(xSize, ySize))
 
-color = ['green', 'green', 'green', 'green', 'green', 'red']
-box_plot = sns.barplot(data=dt, palette=color, ci=None)
+color = ['green', 'green', 'green', 'red']
+box_plot = sns.barplot(data=dt, palette=color)
 
 ax = box_plot.axes
 ax.set_title(sys.argv[3])
