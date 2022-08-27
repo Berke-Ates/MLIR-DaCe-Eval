@@ -17,27 +17,38 @@ def printArray(arr, offset, depth):
         print("%.4f " % arr, end='', file=sys.stderr)
 
 
-# def print1DArray(arr):
-#     for elemIdx, elem in enumerate(arr):
-#         if elemIdx % 20 == 0:
-#             print("", file=sys.stderr)
-#         printDouble(elem)
+def printDoitgen(arr):
+    NR = 10
+    NQ = 8
+    NP = 12
+    for i in range(NR):
+        for j in range(NQ):
+            for k in range(NP):
+                if (i * NQ * NP + j * NP + k) % 20 == 0:
+                    print("", file=sys.stderr)
+                print("%.4f " % arr[i, j, k], end='', file=sys.stderr)
 
-# def print2DArray(arr):
-#     for rowIdx, row in enumerate(arr):
-#         for elemIdx, elem in enumerate(row):
-#             if (rowIdx * len(arr) + elemIdx) % 20 == 0:
-#                 print("", file=sys.stderr)
-#             printDouble(elem)
 
-# def print3DArray(arr):
-#     for rowIdx, row in enumerate(arr):
-#         for colIdx, col in enumerate(row):
-#             for elemIdx, elem in enumerate(col):
-#                 if (rowIdx * len(row) * len(arr) + colIdx * len(row) +
-#                         elemIdx) % 20 == 0:
-#                     print("", file=sys.stderr)
-#                 printDouble(elem)
+def printCholesky(arr):
+    N = 40
+    for i in range(N):
+        for j in range(i + 1):
+            if (i * N + j) % 20 == 0:
+                print("", file=sys.stderr)
+            print("%.4f " % arr[i, j], end='', file=sys.stderr)
+
+
+def printGramschmidt(arr, useN):
+    M = 20
+    N = 30
+    iUB = N if useN else M
+
+    for i in range(iUB):
+        for j in range(N):
+            if (i * N + j) % 20 == 0:
+                print("", file=sys.stderr)
+            print("%.4f " % arr[i, j], end='', file=sys.stderr)
+
 
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
@@ -56,6 +67,9 @@ print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 for argName, arr in argDict.items():
     print("begin dump: %s" % argName, end='', file=sys.stderr)
     printArray(arr, 0, len(arr.shape))
+    # printCholesky(arr)
+    # printDoitgen(arr)
+    # printGramschmidt(arr, argName == "_arg1")
     print("\nend   dump: %s" % argName, file=sys.stderr)
 
 print("==END   DUMP_ARRAYS==", file=sys.stderr)
