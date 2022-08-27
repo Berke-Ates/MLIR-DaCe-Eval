@@ -1,6 +1,6 @@
 import sys
 
-# sys.path.insert(0, "/home/xdb/dace")
+sys.path.insert(0, "/home/xdb/dace")
 
 import time
 import dace

@@ -5,14 +5,13 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DLARGE_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS -fPIC -march=native"
+flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS -fPIC -march=native"
 opt_lvl=-O2
 out_dir=./out
 repetitions=$2
-gc_time=10
+gc_time=1
 
 export DACE_compiler_cpu_openmp_sections=0
-export DACE_compiler_inline_sdfgs=1
 export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
@@ -91,6 +90,8 @@ $clang -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src $dr
 printf "$fmt_list" "Generated:" "Clang"
 $clangpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src $driver &> /dev/null
 printf "$fmt_list" "Generated:" "Clang++"
+$clang -I $util_folder -O0 $flags -o $out_dir/$src_name\_ref.out $src $driver -lm
+printf "$fmt_list" "Generated:" "Reference"
 
 # Generate mlir
 
@@ -150,8 +151,8 @@ $clang $opt_lvl $flags $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir \
-| $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
+$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
+$sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
 
 # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
@@ -161,7 +162,21 @@ printf "$fmt_list" "Compiled:" "Optimized SDFG"
 # Run benchmark
 timings=$out_dir/timings.txt
 touch $timings
-# expected=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+
+./$out_dir/$src_name\_ref.out 2> reference.txt
+
+touch arrNames.txt
+
+grep "begin dump:" reference.txt | while read -r line ; do
+  arrTmp=($line)
+  arrName=${arrTmp[2]}
+  echo -n "$arrName " >> arrNames.txt
+done
+
+arrNames=($(cat arrNames.txt))
+rm arrNames.txt
+
+### GCC ###
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -170,34 +185,22 @@ printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_gcc.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+  ./$out_dir/$src_name\_gcc.out 2> comparison_gcc.txt
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i:" "Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
+  $python polybench-comparator/comparator.py reference.txt comparison_gcc.txt
+
+  if [ $? -eq 0 ]; then
+    printf "$fmt_list" "Output $i:" "Correct"
+  else
+    printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
+  fi
+
+  rm comparison_gcc.txt
 done
 
-# printf "$fmt_list" "Waiting for GC"
-# sleep $gc_time
-
-# printf "$fmt_start_nl" "Running:" "G++"
-# echo -e "\n--- G++ ---" >> $timings
-# for i in $(seq 1 $repetitions); do
-#   ts=$(date +%s%N)
-#   actual=$(./$out_dir/$src_name\_gpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
-#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-
-#   # if [[ "$actual" == "$expected" ]]; then
-#   #   printf "$fmt_list" "Output $i:" "Correct"
-#   # else
-#   #   printf "$fmt_err" "Output $i:" "Incorrect!"
-#   #   echo "Incorrect!" >> $timings
-#   # fi
-# done
+### Clang ###
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -206,34 +209,22 @@ printf "$fmt_start_nl" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_clang.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+  ./$out_dir/$src_name\_clang.out 2> comparison_clang.txt 
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i:" "Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
+  $python polybench-comparator/comparator.py reference.txt comparison_clang.txt
+
+  if [ $? -eq 0 ]; then
+    printf "$fmt_list" "Output $i:" "Correct"
+  else
+    printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
+  fi
+
+  rm comparison_clang.txt
 done
 
-# printf "$fmt_list" "Waiting for GC"
-# sleep $gc_time
-
-# printf "$fmt_start_nl" "Running:" "Clang++"
-# echo -e "\n--- Clang++ ---" >> $timings
-# for i in $(seq 1 $repetitions); do
-#   ts=$(date +%s%N)
-#   actual=$(./$out_dir/$src_name\_clangpp.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
-#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-
-#   # if [[ "$actual" == "$expected" ]]; then
-#   #   printf "$fmt_list" "Output $i:" "Correct"
-#   # else
-#   #   printf "$fmt_err" "Output $i:" "Incorrect!"
-#   #   echo "Incorrect!" >> $timings
-#   # fi
-# done
+### MLIR ###
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -242,16 +233,22 @@ printf "$fmt_start_nl" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
   ts=$(date +%s%N)
-  actual=$(./$out_dir/$src_name\_mlir.out 2>&1 | grep -ivwE "(begin|end|warning|==BEGIN|==END)" | sed "s/-0.000/0.000/g")
+  ./$out_dir/$src_name\_mlir.out 2> comparison_mlir.txt
   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i:" "Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
+  $python polybench-comparator/comparator.py reference.txt comparison_mlir.txt
+
+  if [ $? -eq 0 ]; then
+    printf "$fmt_list" "Output $i:" "Correct"
+  else
+    printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
+  fi
+
+  rm comparison_mlir.txt
 done
+
+### SDFG ###
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -259,33 +256,30 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  $python run.py $out_dir/$src_name\_opt.sdfg 2> .dump_opt.tmp >> $timings
-  # actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_opt.tmp | sed "s/-0.000/0.000/g")
-  rm .dump_opt.tmp
+  $python run.py $out_dir/$src_name\_opt.sdfg 2> comparison_sdfg.txt >> $timings
+  
+  sed -i '0,/^==BEGIN DUMP_ARRAYS==$/d' comparison_sdfg.txt
+  printf '%s\n%s\n' "==BEGIN DUMP_ARRAYS==" "$(cat comparison_sdfg.txt)" > comparison_sdfg.txt
 
-  # if [[ "$actual" == "$expected" ]]; then
-  #   printf "$fmt_list" "Output $i:" "Correct"
-  # else
-  #   printf "$fmt_err" "Output $i: Incorrect!"
-  #   echo "Incorrect!" >> $timings
-  # fi
+  idx=0
+  grep "begin dump:" comparison_sdfg.txt | while read -r line ; do
+    arrTmp=($line)
+    arrName=${arrTmp[2]}
+    repArrName=${arrNames[idx]}
+    sed -i -e "s/$arrName/$repArrName/g" comparison_sdfg.txt
+    idx=$((idx+1))  
+  done
+
+  $python polybench-comparator/comparator.py reference.txt comparison_sdfg.txt
+
+  if [ $? -eq 0 ]; then
+    printf "$fmt_list" "Output $i:" "Correct"
+  else
+    printf "$fmt_err" "Output $i:" "Incorrect!"
+    echo "Incorrect!" >> $timings
+  fi
+
+  rm comparison_sdfg.txt
 done
 
-# printf "$fmt_list" "Waiting for GC"
-# sleep $gc_time
-
-# printf "$fmt_start_nl" "Running:" "SDFG Non-Opt"
-# echo -e "\n--- SDFG NOOPT ---" >> $timings
-# for i in $(seq 1 $repetitions); do
-#   $python run.py $out_dir/$src_name\_noopt.sdfg 2> .dump_noopt.tmp >> $timings
-#   actual=$(grep -ivwE "(begin|end|warning|==BEGIN|==END)" .dump_noopt.tmp | sed "s/-0.000/0.000/g")
-#   rm .dump_noopt.tmp
-
-#   if [[ "$actual" == "$expected" ]]; then
-#     printf "$fmt_list" "Output $i:" "Correct"
-#   else
-#     printf "$fmt_err" "Output $i: Incorrect!"
-#     # echo "Incorrect!" >> $timings
-#   fi
-# done
-
+rm reference.txt

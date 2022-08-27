@@ -4,10 +4,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 
-yLabel = {"2mm", "floyd-warshall", "symm"}
+yLabel = {"2mm", "durbin", "lu"}
 noXLabel = {
     "2mm", "3mm", "adi", "atax", "bicg", "cholesky", "correlation",
-    "covariance", "deriche", "doitgen", "durbin", "fdtd-2d"
+    "covariance", "deriche", "doitgen"
 }
 
 

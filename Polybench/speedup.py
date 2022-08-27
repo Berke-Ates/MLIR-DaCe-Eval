@@ -23,6 +23,8 @@ for file in os.listdir(directory):
         acc = acc * speedup
         count = count + 1
 
+        print(filename, speedup)
+
         continue
     else:
         continue
