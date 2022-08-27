@@ -5,7 +5,7 @@
 # Settings
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
-flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -fPIC -march=native"
+flags="-DLARGE_DATASET -DDATA_TYPE_IS_DOUBLE -fPIC -march=native"
 opt_lvl=-O2
 out_dir=./out
 repetitions=$2
