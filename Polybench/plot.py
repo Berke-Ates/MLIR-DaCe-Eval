@@ -68,7 +68,7 @@ ax = box_plot.axes
 ax.set_title(sys.argv[3])
 
 if sys.argv[3] in yLabel:
-    ax.set(ylabel='runtime (ms)')
+    ax.set(ylabel='Runtime [ms]')
 
 if sys.argv[3] in noXLabel:
     ax.set(xticklabels=[])

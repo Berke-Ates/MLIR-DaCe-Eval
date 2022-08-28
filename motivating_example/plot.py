@@ -35,7 +35,7 @@ plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
-ax.set(ylabel='runtime (ms)')
+ax.set(ylabel='Runtime [ms]')
 ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
 
 add_median_labels(ax)
