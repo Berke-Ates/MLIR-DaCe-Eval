@@ -82,22 +82,16 @@ src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
-$gcc -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src $driver -lm
+$gcc -I $util_folder $opt_lvl $flags -DPOLYBENCH_TIME -o $out_dir/$src_name\_gcc.out $src $driver -lm
 printf "$fmt_list" "Generated:" "GCC"
-$gpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gpp.out $src $driver
-printf "$fmt_list" "Generated:" "G++"
-$clang -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src $driver -lm
+$clang -I $util_folder $opt_lvl $flags -DPOLYBENCH_TIME -o $out_dir/$src_name\_clang.out $src $driver -lm
 printf "$fmt_list" "Generated:" "Clang"
-$clangpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src $driver &> /dev/null
-printf "$fmt_list" "Generated:" "Clang++"
-$clang -I $util_folder -O0 $flags -o $out_dir/$src_name\_ref.out $src $driver -lm
-printf "$fmt_list" "Generated:" "Reference"
 
 # Generate mlir
 
 # Polygeist c/cpp -> mlir
 $cgeist -resource-dir=$($clang -print-resource-dir) -I $util_folder \
-  -S --memref-fullrank $opt_lvl --raise-scf-to-affine $flags $src | \
+  -S --memref-fullrank $opt_lvl --raise-scf-to-affine $flags -DPOLYBENCH_TIME $src | \
 $mlir_opt --affine-loop-invariant-code-motion | \
 $mlir_opt --affine-scalrep | \
 $mlir_opt --lower-affine | \
@@ -152,7 +146,7 @@ $llc $opt_lvl --relocation-model=pic $out_dir/$src_name.ll -o $out_dir/$src_name
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $flags $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.out -lm
+$clang $opt_lvl $flags -DPOLYBENCH_TIME  $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.out -lm
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
@@ -172,9 +166,7 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  ./$out_dir/$src_name\_gcc.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  ./$out_dir/$src_name\_gcc.out >> $timings
 done
 
 ### Clang ###
@@ -185,9 +177,7 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  ./$out_dir/$src_name\_clang.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  ./$out_dir/$src_name\_clang.out >> $timings
 done
 
 ### MLIR ###
@@ -198,9 +188,7 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  ./$out_dir/$src_name\_mlir.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  ./$out_dir/$src_name\_mlir.out >> $timings
 done
 
 ### SDFG ###
@@ -211,6 +199,6 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  $python run_noprint.py $out_dir/$src_name\_opt.sdfg >> $timings
+  $python run_noprint.py $out_dir/$src_name\_opt.sdfg 2> /dev/null >> $timings
 done
 
