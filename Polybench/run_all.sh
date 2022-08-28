@@ -42,7 +42,7 @@ for filename in $benchmarks; do
       echo -ne "\033[2K\r"
       echo -ne "$prog ($percent%) ($bname)"
 
-      ./run.sh $filename $repetitions &> /dev/null
+      ./run_noprint.sh $filename $repetitions &> /dev/null
       cp $result_dir/timings.txt $out_dir/$bname.txt
 
       ./convert_csv.sh $out_dir/$bname.txt $repetitions &> /dev/null
