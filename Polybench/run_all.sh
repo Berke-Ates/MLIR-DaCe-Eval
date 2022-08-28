@@ -5,7 +5,7 @@
 # Settings
 out_dir=./timings
 result_dir=./out
-repetitions=11
+repetitions=100
 
 # Create output directory
 if [ ! -d $out_dir ]; then
