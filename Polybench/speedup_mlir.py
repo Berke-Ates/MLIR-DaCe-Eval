@@ -16,10 +16,9 @@ for file in os.listdir(directory):
         df = df.median()
 
         sdfg_ms = df.iloc[-1]
-        df = df.iloc[:-1]
-        fastest_ms = df.min()
+        mlir_ms = df.iloc[-2]
 
-        speedup = fastest_ms / sdfg_ms
+        speedup = mlir_ms / sdfg_ms
         acc = acc * speedup
         count = count + 1
 
