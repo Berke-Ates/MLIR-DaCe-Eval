@@ -1,0 +1,1224 @@
+{
+  "type": "SDFG",
+  "sdfg_list_id": 0,
+  "start_state": 0,
+  "attributes": {
+    "debuginfo": {
+      "type": "DebugInfo",
+      "start_line": 2,
+      "end_line": 2,
+      "start_column": 3,
+      "end_column": 3,
+      "filename": "example_sdfg.mlir"
+    },
+    "name": "sdfg_0",
+    "arg_names": [
+      "_arg0",
+      "_arg1",
+      "_arg2"
+    ],
+    "constants_prop": {
+    },
+    "_arrays": {
+      "_arg0": {
+        "type": "Array",
+        "attributes": {
+          "transient": false,
+          "dtype": "int32",
+          "shape": [
+            "s_0"
+          ],
+          "strides": [
+            "1"
+          ]
+        }
+      },
+      "_arg1": {
+        "type": "Array",
+        "attributes": {
+          "transient": false,
+          "dtype": "int32",
+          "shape": [
+            "s_1"
+          ],
+          "strides": [
+            "1"
+          ]
+        }
+      },
+      "_arg2": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": false,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "_addi_tmp_10": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "_load_tmp_7": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "_load_tmp_5": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "_constant_tmp_4": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int64",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "tmp_1": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int64",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "tmp_2": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "tmp_3": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      },
+      "tmp_4": {
+        "type": "Scalar",
+        "attributes": {
+          "transient": true,
+          "dtype": "int32",
+          "shape": [
+            "1"
+          ]
+        }
+      }
+    },
+    "symbols": {
+      "s_0": "int64",
+      "s_1": "int64"
+    }
+  },
+  "nodes": [
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 7,
+        "end_line": 7,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "init_2",
+      "id": 0,
+      "attributes": {
+      },
+      "nodes": [
+      ],
+      "edges": [
+      ]
+    },
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 9,
+        "end_line": 9,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "constant_3",
+      "id": 1,
+      "attributes": {
+      },
+      "nodes": [
+        {
+          "type": "Tasklet",
+          "label": "constant",
+          "id": 0,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 10,
+              "end_line": 10,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "label": "constant",
+            "code": {
+              "string_data": "__out0 = 0\n\n",
+              "language": "Python"
+            },
+            "in_connectors": {
+            },
+            "out_connectors": {
+              "__out0": null
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "tmp_1",
+          "id": 1,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 10,
+              "end_line": 10,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "tmp_1",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_constant_tmp_4",
+          "id": 2,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 14,
+              "end_line": 14,
+              "start_column": 7,
+              "end_column": 7,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_constant_tmp_4",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "type": "MultiConnectorEdge",
+          "src": "0",
+          "dst": "1",
+          "src_connector": "__out0",
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 10,
+              "end_line": 10,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_1",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "1",
+          "dst": "2",
+          "src_connector": null,
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 9,
+              "end_line": 9,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_1",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 17,
+        "end_line": 17,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "load_6",
+      "id": 2,
+      "attributes": {
+      },
+      "nodes": [
+        {
+          "type": "AccessNode",
+          "label": "_constant_tmp_4",
+          "id": 0,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 17,
+              "end_line": 17,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_constant_tmp_4",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "Tasklet",
+          "label": "indirect_load_arg0",
+          "id": 1,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 19,
+              "end_line": 19,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "label": "indirect_load_arg0",
+            "code": {
+              "string_data": "_out = _array[_i0]",
+              "language": "Python"
+            },
+            "in_connectors": {
+              "_array": null,
+              "_i0": null
+            },
+            "out_connectors": {
+              "_out": null
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "tmp_2",
+          "id": 2,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 19,
+              "end_line": 19,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "tmp_2",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_arg0",
+          "id": 3,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 17,
+              "end_line": 17,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_arg0",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_load_tmp_5",
+          "id": 4,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 20,
+              "end_line": 20,
+              "start_column": 7,
+              "end_column": 7,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_load_tmp_5",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "type": "MultiConnectorEdge",
+          "src": "1",
+          "dst": "2",
+          "src_connector": "_out",
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 19,
+              "end_line": 19,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_2",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "3",
+          "dst": "1",
+          "src_connector": null,
+          "dst_connector": "_array",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 19,
+              "end_line": 19,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_arg0",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "0",
+          "dst": "1",
+          "src_connector": null,
+          "dst_connector": "_i0",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 19,
+              "end_line": 19,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_constant_tmp_4",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "2",
+          "dst": "4",
+          "src_connector": null,
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 17,
+              "end_line": 17,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_2",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 23,
+        "end_line": 23,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "load_8",
+      "id": 3,
+      "attributes": {
+      },
+      "nodes": [
+        {
+          "type": "AccessNode",
+          "label": "_constant_tmp_4",
+          "id": 0,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 23,
+              "end_line": 23,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_constant_tmp_4",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "Tasklet",
+          "label": "indirect_load_arg1",
+          "id": 1,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 25,
+              "end_line": 25,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "label": "indirect_load_arg1",
+            "code": {
+              "string_data": "_out = _array[_i0]",
+              "language": "Python"
+            },
+            "in_connectors": {
+              "_array": null,
+              "_i0": null
+            },
+            "out_connectors": {
+              "_out": null
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "tmp_3",
+          "id": 2,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 25,
+              "end_line": 25,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "tmp_3",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_arg1",
+          "id": 3,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 23,
+              "end_line": 23,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_arg1",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_load_tmp_7",
+          "id": 4,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 26,
+              "end_line": 26,
+              "start_column": 7,
+              "end_column": 7,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_load_tmp_7",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "type": "MultiConnectorEdge",
+          "src": "1",
+          "dst": "2",
+          "src_connector": "_out",
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 25,
+              "end_line": 25,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_3",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "3",
+          "dst": "1",
+          "src_connector": null,
+          "dst_connector": "_array",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 25,
+              "end_line": 25,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_arg1",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "0",
+          "dst": "1",
+          "src_connector": null,
+          "dst_connector": "_i0",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 25,
+              "end_line": 25,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_constant_tmp_4",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "2",
+          "dst": "4",
+          "src_connector": null,
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 23,
+              "end_line": 23,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_3",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 29,
+        "end_line": 29,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "addi_9",
+      "id": 4,
+      "attributes": {
+      },
+      "nodes": [
+        {
+          "type": "AccessNode",
+          "label": "_load_tmp_5",
+          "id": 0,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 29,
+              "end_line": 29,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_load_tmp_5",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_load_tmp_7",
+          "id": 1,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 29,
+              "end_line": 29,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_load_tmp_7",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "Tasklet",
+          "label": "addi",
+          "id": 2,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 32,
+              "end_line": 32,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "label": "addi",
+            "code": {
+              "string_data": "__out0 = _arg3 + _arg4\n\n",
+              "language": "Python"
+            },
+            "in_connectors": {
+              "_arg3": null,
+              "_arg4": null
+            },
+            "out_connectors": {
+              "__out0": null
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "tmp_4",
+          "id": 3,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 32,
+              "end_line": 32,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "tmp_4",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_addi_tmp_10",
+          "id": 4,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 36,
+              "end_line": 36,
+              "start_column": 7,
+              "end_column": 7,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_addi_tmp_10",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "type": "MultiConnectorEdge",
+          "src": "0",
+          "dst": "2",
+          "src_connector": null,
+          "dst_connector": "_arg3",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 32,
+              "end_line": 32,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_load_tmp_5",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "1",
+          "dst": "2",
+          "src_connector": null,
+          "dst_connector": "_arg4",
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 32,
+              "end_line": 32,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_load_tmp_7",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "2",
+          "dst": "3",
+          "src_connector": "__out0",
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 32,
+              "end_line": 32,
+              "start_column": 12,
+              "end_column": 12,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_4",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        },
+        {
+          "type": "MultiConnectorEdge",
+          "src": "3",
+          "dst": "4",
+          "src_connector": null,
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 29,
+              "end_line": 29,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "tmp_4",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "SDFGState",
+      "debuginfo": {
+        "type": "DebugInfo",
+        "start_line": 39,
+        "end_line": 39,
+        "start_column": 5,
+        "end_column": 5,
+        "filename": "example_sdfg.mlir"
+      },
+      "label": "return_11",
+      "id": 5,
+      "attributes": {
+      },
+      "nodes": [
+        {
+          "type": "AccessNode",
+          "label": "_addi_tmp_10",
+          "id": 0,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 39,
+              "end_line": 39,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_addi_tmp_10",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        },
+        {
+          "type": "AccessNode",
+          "label": "_arg2",
+          "id": 1,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 41,
+              "end_line": 41,
+              "start_column": 7,
+              "end_column": 7,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": "_arg2",
+            "in_connectors": {
+            },
+            "out_connectors": {
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "type": "MultiConnectorEdge",
+          "src": "0",
+          "dst": "1",
+          "src_connector": null,
+          "dst_connector": null,
+          "attributes": {
+            "debuginfo": {
+              "type": "DebugInfo",
+              "start_line": 39,
+              "end_line": 39,
+              "start_column": 5,
+              "end_column": 5,
+              "filename": "example_sdfg.mlir"
+            },
+            "data": {
+              "type": "Memlet",
+              "attributes": {
+                "data": "_addi_tmp_10",
+                "subset": null,
+                "src_subset": null,
+                "other_subset": null,
+                "dst_subset": null
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "type": "Edge",
+      "src": "0",
+      "dst": "1",
+      "attributes": {
+        "debuginfo": {
+          "type": "DebugInfo",
+          "start_line": 43,
+          "end_line": 43,
+          "start_column": 5,
+          "end_column": 5,
+          "filename": "example_sdfg.mlir"
+        },
+        "data": {
+          "type": "InterstateEdge",
+          "attributes": {
+            "assignments": {
+            },
+            "condition": {
+              "string_data": "1",
+              "language": "Python"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Edge",
+      "src": "1",
+      "dst": "2",
+      "attributes": {
+        "debuginfo": {
+          "type": "DebugInfo",
+          "start_line": 44,
+          "end_line": 44,
+          "start_column": 5,
+          "end_column": 5,
+          "filename": "example_sdfg.mlir"
+        },
+        "data": {
+          "type": "InterstateEdge",
+          "attributes": {
+            "assignments": {
+            },
+            "condition": {
+              "string_data": "1",
+              "language": "Python"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Edge",
+      "src": "2",
+      "dst": "3",
+      "attributes": {
+        "debuginfo": {
+          "type": "DebugInfo",
+          "start_line": 45,
+          "end_line": 45,
+          "start_column": 5,
+          "end_column": 5,
+          "filename": "example_sdfg.mlir"
+        },
+        "data": {
+          "type": "InterstateEdge",
+          "attributes": {
+            "assignments": {
+            },
+            "condition": {
+              "string_data": "1",
+              "language": "Python"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Edge",
+      "src": "3",
+      "dst": "4",
+      "attributes": {
+        "debuginfo": {
+          "type": "DebugInfo",
+          "start_line": 46,
+          "end_line": 46,
+          "start_column": 5,
+          "end_column": 5,
+          "filename": "example_sdfg.mlir"
+        },
+        "data": {
+          "type": "InterstateEdge",
+          "attributes": {
+            "assignments": {
+            },
+            "condition": {
+              "string_data": "1",
+              "language": "Python"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Edge",
+      "src": "4",
+      "dst": "5",
+      "attributes": {
+        "debuginfo": {
+          "type": "DebugInfo",
+          "start_line": 47,
+          "end_line": 47,
+          "start_column": 5,
+          "end_column": 5,
+          "filename": "example_sdfg.mlir"
+        },
+        "data": {
+          "type": "InterstateEdge",
+          "attributes": {
+            "assignments": {
+            },
+            "condition": {
+              "string_data": "1",
+              "language": "Python"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
