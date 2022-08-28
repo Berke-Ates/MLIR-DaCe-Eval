@@ -15,9 +15,10 @@ color = ['green', 'green', 'green', 'red']
 sns.set(style="darkgrid")
 # sns.set(font_scale=1.2)
 
-fig, ax = plt.subplots(rows, cols, sharex='col')
+fig, ax = plt.subplots(rows, cols, sharex='row')
 fig.set_figheight(10)
 fig.set_figwidth(15)
+fig.supylabel('Runtime [s]')
 
 for i in range(num_bench):
     dt.append(pd.read_csv(sys.argv[i + 2]))
@@ -36,12 +37,10 @@ for i in range(rows):
             os.path.basename(sys.argv[i * cols + j + 2]))[0]
         ax[i, j].set_title(bench_name)
         ax[i, j].set_xticklabels(ax[i, j].get_xticklabels(),
-                                 rotation=45,
-                                 ha="right")
+                                 rotation=90,
+                                 ha="center")
         if (i < rows - 1):
             ax[i, j].set(xticklabels=[])
-
-    ax[i, 0].set(ylabel='Runtime [ms]')
 
 plt.tight_layout()
 plt.savefig(sys.argv[1], dpi=300, bbox_inches='tight')
