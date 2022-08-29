@@ -7,11 +7,11 @@ flags="-fPIC -march=native"
 opt_lvl=-O3
 out_dir=./out
 max_time=1m
-repetitions=12
+repetitions=10
 gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
-export DACE_compiler_inline_sdfgs=1
+export DACE_instrumentation_report_each_invocation=0
 export DACE_compiler_cpu_args="-fPIC -O3 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
@@ -79,17 +79,14 @@ src=$1
 src_name=$(basename ${src%.*})
 src_ext=${src##*.}
 src_dir=$(dirname $src)
+src_chrono="$src_name\_chrono.c"
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
-$gcc $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src
+$gcc $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src_chrono
 printf "$fmt_list" "Generated:" "GCC"
-$gpp $opt_lvl $flags -o $out_dir/$src_name\_gpp.out $src
-printf "$fmt_list" "Generated:" "G++"
-$clang $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src
+$clang $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src_chrono
 printf "$fmt_list" "Generated:" "Clang"
-$clangpp $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src &> /dev/null
-printf "$fmt_list" "Generated:" "Clang++"
 
 # Generate mlir
 $cgeist -resource-dir=$($clang -print-resource-dir) \
@@ -103,12 +100,19 @@ $cgeist -resource-dir=$($clang -print-resource-dir) \
 $mlir_opt --lower-affine > $out_dir/$src_name\_noopt.mlir
 printf "$fmt_list" "Generated:" "Non-optimized MLIR"
 
+# Generate mlir
+$cgeist $flags -resource-dir=$($clang -print-resource-dir) \
+  -S --memref-fullrank $opt_lvl --raise-scf-to-affine $src_chrono | \
+$mlir_opt --affine-loop-invariant-code-motion | $mlir_opt --affine-scalrep | \
+$mlir_opt --lower-affine | $mlir_opt --cse > $out_dir/$src_name\_cgeist.mlir
+printf "$fmt_list" "Generated:" "Polygeist MLIR"
+
 ### Lower through MLIR ###
 
 # Lower to llvm 
 $mlir_opt --convert-scf-to-cf --convert-func-to-llvm --convert-cf-to-llvm \
   --lower-host-to-llvm --reconcile-unrealized-casts \
-  $out_dir/$src_name\_opt.mlir > $out_dir/$src_name.mlir
+  $out_dir/$src_name\_cgeist.mlir > $out_dir/$src_name.mlir
 printf "$fmt_list" "Lowered to:" "LLVM"
 
 # Translate
@@ -120,7 +124,7 @@ $llc $opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
+$clang -no-pie $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
@@ -142,21 +146,9 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  timeout $max_time $out_dir/$src_name\_gcc.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  $out_dir/$src_name\_gcc.out >> $timings
 done
 
-# printf "$fmt_list" "Waiting for GC"
-# sleep $gc_time
-
-# printf "$fmt_list" "Running:" "G++"
-# echo -e "\n--- G++ ---" >> $timings
-# for i in $(seq 1 $repetitions); do
-#   ts=$(date +%s%N)
-#   timeout $max_time $out_dir/$src_name\_gpp.out
-#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-# done
 
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
@@ -164,40 +156,7 @@ sleep $gc_time
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  timeout $max_time $out_dir/$src_name\_clang.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-done
-
-# printf "$fmt_list" "Waiting for GC"
-# sleep $gc_time
-
-# printf "$fmt_list" "Running:" "Clang++"
-# echo -e "\n--- Clang++ ---" >> $timings
-# for i in $(seq 1 $repetitions); do
-#   ts=$(date +%s%N)
-#   timeout $max_time $out_dir/$src_name\_clangpp.out
-#   echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-# done
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "MLIR"
-echo -e "\n--- MLIR ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  timeout $max_time $out_dir/$src_name\_mlir.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
-done
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "SDFG Opt"
-echo -e "\n--- SDFG OPT ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  timeout $max_time $python run.py $out_dir/$src_name\_opt.sdfg >> $timings
+  $out_dir/$src_name\_clang.out >> $timings
 done
 
 printf "$fmt_list" "Waiting for GC"
@@ -205,6 +164,22 @@ sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
+$python run.py $out_dir/$src_name\_noopt.sdfg >> $timings
+$python eval.py >> $timings
+
+printf "$fmt_list" "Waiting for GC"
+sleep $gc_time
+
+printf "$fmt_list" "Running:" "MLIR"
+echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  timeout $max_time $python run.py $out_dir/$src_name\_noopt.sdfg >> $timings
+  $out_dir/$src_name\_mlir.out >> $timings
 done
+
+printf "$fmt_list" "Waiting for GC"
+sleep $gc_time
+
+printf "$fmt_list" "Running:" "SDFG Opt"
+echo -e "\n--- SDFG OPT ---" >> $timings
+$python run.py $out_dir/$src_name\_opt.sdfg >> $timings
+$python eval.py >> $timings

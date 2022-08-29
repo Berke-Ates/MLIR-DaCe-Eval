@@ -1,6 +1,6 @@
 import sys
 
-# sys.path.insert(0, "/home/xdb/dace")
+sys.path.insert(0, "/home/xdb/dace")
 
 import time
 import dace
@@ -10,12 +10,12 @@ import dace
 
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
-# A = dace.scalar(dtype=dace.int32)
 
-start_time = time.time()
-obj(
-    #_arg0=A
-)
-elapsed = int((time.time() - start_time) * 1000)
-print("%d" % elapsed)
-#print("res: %s" % A)
+for i in range(10):
+    argDict = {}
+
+    for argName, argType in sdfg.arglist().items():
+        arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
+        argDict[argName] = arr
+
+    obj(**argDict)

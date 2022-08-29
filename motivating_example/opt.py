@@ -1,6 +1,6 @@
 import sys
 
-# sys.path.insert(0, "/home/xdb/dace")
+sys.path.insert(0, "/home/xdb/dace")
 
 import dace
 import json
@@ -14,5 +14,11 @@ sdfg.validate()
 
 sdfg.simplify()
 auto_optimize(sdfg, dace.DeviceType.CPU)
+
+for node, parent in sdfg.all_nodes_recursive():
+    if isinstance(node, dace.nodes.MapEntry):
+        node.schedule = dace.ScheduleType.Sequential
+
+sdfg.instrument = dace.InstrumentationType.Timer
 
 sdfg.save(sys.argv[1])
