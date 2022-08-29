@@ -5,6 +5,9 @@ import sys
 import time
 import dace
 
+sdfg = dace.SDFG.from_file(sys.argv[1])
+obj = sdfg.compile()
+
 # locDom = new Domain(1, 0, 0, 0, 30,
 #                     1, 11, 1, 1);
 
@@ -35,9 +38,6 @@ m_zd = dace.ndarray(shape=(29791, ), dtype=dace.float64)
 
 m_numNode = dace.ndarray(shape=(1, ), dtype=dace.int64)  # 29791
 m_hgcoef = dace.ndarray(shape=(1, ), dtype=dace.float64)  # 3.000000
-
-sdfg = dace.SDFG.from_file(sys.argv[1])
-obj = sdfg.compile()
 
 start_time = time.time()
 obj(
