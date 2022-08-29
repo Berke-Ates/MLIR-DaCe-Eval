@@ -6,7 +6,7 @@
 flags="-fPIC -O2 -march=native"
 out_dir=./out
 repetitions=100
-gc_time=1
+gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_cpu_args="$flags"
@@ -126,7 +126,7 @@ $llc $opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out -lm
+$clang -no-pie $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out -lm
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG

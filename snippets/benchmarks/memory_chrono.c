@@ -7,11 +7,14 @@
 #include <unistd.h>
 #include <limits.h>
 #include <float.h>
+#include <time.h>
 
 // https://github.com/RRZE-HPC/TheBandwidthBenchmark/blob/master/src/main.c
 
 int main(int argc, char **argv)
 {
+  clock_t start = clock();
+
   int SIZE = 800000;
   int NUMBENCH = 1000;
   int NTIMES = 1000;
@@ -89,12 +92,14 @@ int main(int argc, char **argv)
   }
 
   // return check(a, b, c, d, N);
-
   double res = a[0];
   free(a);
   free(b);
   free(c);
   free(d);
+
+  clock_t diff = clock() - start;
+  printf("%lf\n", ((double)diff * 1000) / CLOCKS_PER_SEC);
 
   return res;
 }
