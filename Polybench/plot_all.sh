@@ -14,7 +14,6 @@ $timings/deriche.csv \
 $timings/doitgen.csv \
 $timings/durbin.csv \
 $timings/fdtd-2d.csv \
-$timings/floyd-warshall.csv \
 $timings/gemm.csv \
 $timings/gramschmidt.csv \
 $timings/gesummv.csv \

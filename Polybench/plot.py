@@ -16,7 +16,7 @@ sns.set(style="darkgrid")
 # sns.set(font_scale=1.2)
 
 fig, ax = plt.subplots(rows, cols, sharex='row')
-fig.set_figheight(10)
+fig.set_figheight(7)
 fig.set_figwidth(15)
 fig.supylabel('Runtime [s]')
 
@@ -27,7 +27,7 @@ for i in range(rows):
     for j in range(cols):
         if (i * cols + j >= num_bench):
             ax[i, j].axis('off')
-            break
+            continue
 
         sns.barplot(data=dt[i * cols + j],
                     palette=color,
@@ -36,9 +36,10 @@ for i in range(rows):
         bench_name = os.path.splitext(
             os.path.basename(sys.argv[i * cols + j + 2]))[0]
         ax[i, j].set_title(bench_name)
-        ax[i, j].set_xticklabels(ax[i, j].get_xticklabels(),
+        ax[i, j].set_xticklabels(["GCC", "Clang", "MLIR", "MLIR-DaCe"],
                                  rotation=90,
                                  ha="center")
+
         if (i < rows - 1):
             ax[i, j].set(xticklabels=[])
 

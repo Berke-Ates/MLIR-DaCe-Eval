@@ -48,7 +48,7 @@ plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
-ax.set_title(sys.argv[3])
+# ax.set_title(sys.argv[3])
 ax.set(ylabel='Runtime [ms]')
 
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
