@@ -20,19 +20,11 @@ def printArray(arr, offset, depth):
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
 
-argDict = {}
+for i in range(10):
+    argDict = {}
 
-for argName, argType in sdfg.arglist().items():
-    arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
-    argDict[argName] = arr
+    for argName, argType in sdfg.arglist().items():
+        arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
+        argDict[argName] = arr
 
-start_time = time.time()
-obj(**argDict)
-print("%f" % (time.time() - start_time))
-
-for argName, arr in argDict.items():
-    print("begin dump: %s" % argName, end='', file=sys.stderr)
-    printArray(arr, 0, len(arr.shape))
-    print("\nend   dump: %s" % argName, file=sys.stderr)
-
-print("==END   DUMP_ARRAYS==", file=sys.stderr)
+    obj(**argDict)

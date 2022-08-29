@@ -84,12 +84,8 @@ printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 # Generate executables
 $gcc -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src $driver -lm
 printf "$fmt_list" "Generated:" "GCC"
-$gpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gpp.out $src $driver
-printf "$fmt_list" "Generated:" "G++"
 $clang -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src $driver -lm
 printf "$fmt_list" "Generated:" "Clang"
-$clangpp -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_clangpp.out $src $driver &> /dev/null
-printf "$fmt_list" "Generated:" "Clang++"
 $clang -I $util_folder -O0 $flags -o $out_dir/$src_name\_ref.out $src $driver -lm
 printf "$fmt_list" "Generated:" "Reference"
 
@@ -154,10 +150,6 @@ printf "$fmt_list" "Assembled using:" "Clang"
 $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
 $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
-
-# $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
-# | $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_noopt.sdfg
-# printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
 
 # Run benchmark
 timings=$out_dir/timings.txt

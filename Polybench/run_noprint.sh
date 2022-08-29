@@ -12,6 +12,7 @@ repetitions=$2
 gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
+export DACE_instrumentation_report_each_invocation=0
 export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
@@ -198,7 +199,6 @@ sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $python run_noprint.py $out_dir/$src_name\_opt.sdfg 2> /dev/null >> $timings
-done
+$python run_noprint.py $out_dir/$src_name\_opt.sdfg 2> /dev/null
+$python eval.py >> $timings
 
