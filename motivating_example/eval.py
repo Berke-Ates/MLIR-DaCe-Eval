@@ -9,4 +9,4 @@ f = open(latest_file)
 data = json.load(f)
 
 for event in data['traceEvents']:
-    print(event['dur'] / (1000 * 1000))
+    print(event['dur'] / (1000))

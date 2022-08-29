@@ -29,7 +29,7 @@ int main()
   free(B);
 
   clock_t diff = clock() - start;
-  printf("%lf\n", (double)diff / CLOCKS_PER_SEC);
+  printf("%lf\n", ((double)diff * 1000) / CLOCKS_PER_SEC);
 
   return res;
 }
