@@ -73,7 +73,7 @@ src=$1
 src_name=$(basename ${src%.*})
 src_ext=${src##*.}
 src_dir=$(dirname $src)
-src_chrono="$src_dir/$src_name\_chrono.c"
+src_chrono="$src_dir/$src_name-chrono.c"
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 ### Generate executables ###
