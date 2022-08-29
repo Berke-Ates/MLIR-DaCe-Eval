@@ -75,11 +75,11 @@ if [ -z ${1+x} ]; then
   printf "$fmt_err" "Please provide a C/C++ file"
   exit 1;
 fi
-src=$1
+src="loop.c"
 src_name=$(basename ${src%.*})
 src_ext=${src##*.}
 src_dir=$(dirname $src)
-src_chrono="$src_name\_chrono.c"
+src_chrono="loop_chrono.c"
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 # Generate executables
