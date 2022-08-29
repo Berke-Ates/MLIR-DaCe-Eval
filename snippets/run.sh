@@ -5,7 +5,7 @@
 ### Settings ###
 flags="-fPIC -O2 -march=native"
 out_dir=./out
-repetitions=100
+repetitions=10
 gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0

@@ -11,7 +11,7 @@ from dace.sdfg.utils import load_precompiled_sdfg
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
 
-for i in range(100):
+for i in range(10):
 
     argDict = {}
 
