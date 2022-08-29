@@ -19,3 +19,6 @@ for i in range(10):
         argDict[argName] = arr
 
     obj(**argDict)
+
+# for argName, arr in argDict.items():
+#     print(arr)
