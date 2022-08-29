@@ -5,12 +5,13 @@
 ### Settings ###
 flags="-fPIC -O2 -march=native"
 out_dir=./out
-repetitions=100
-gc_time=1
+repetitions=10
+gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_cpu_args="$flags"
-export DACE_debugprint=verbose
+export DACE_instrumentation_report_each_invocation=0
+# export DACE_debugprint=verbose
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 clang=$(which clang)                     || clang="NOT FOUND"
@@ -72,22 +73,31 @@ src=$1
 src_name=$(basename ${src%.*})
 src_ext=${src##*.}
 src_dir=$(dirname $src)
+src_chrono="$src_dir/$src_name\_chrono.c"
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
 ### Generate executables ###
-$gcc $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src -lm
+$gcc $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src_chrono -lm
 printf "$fmt_list" "Generated:" "GCC"
-$clang $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src -lm
+$clang $opt_lvl $flags -o $out_dir/$src_name\_clang.out $src_chrono -lm
 printf "$fmt_list" "Generated:" "Clang"
 
 #### Generate mlir ###
+$cgeist -resource-dir=$($clang -print-resource-dir) \
+  -S --memref-fullrank $opt_lvl --raise-scf-to-affine $src_chrono | \
+$mlir_opt --affine-loop-invariant-code-motion -allow-unregistered-dialect | \
+$mlir_opt --affine-scalrep -allow-unregistered-dialect | \
+$mlir_opt --lower-affine -allow-unregistered-dialect | \
+$mlir_opt --cse -allow-unregistered-dialect > $out_dir/$src_name\_chrono.mlir
+cp $out_dir/$src_name\_chrono.mlir $out_dir/$src_name.mlir
+printf "$fmt_list" "Generated:" "Optimized MLIR (Chrono)"
+
 $cgeist -resource-dir=$($clang -print-resource-dir) \
   -S --memref-fullrank $opt_lvl --raise-scf-to-affine $src | \
 $mlir_opt --affine-loop-invariant-code-motion -allow-unregistered-dialect | \
 $mlir_opt --affine-scalrep -allow-unregistered-dialect | \
 $mlir_opt --lower-affine -allow-unregistered-dialect | \
 $mlir_opt --cse -allow-unregistered-dialect > $out_dir/$src_name\_opt.mlir
-cp $out_dir/$src_name\_opt.mlir $out_dir/$src_name.mlir
 printf "$fmt_list" "Generated:" "Optimized MLIR"
 
 ### Lower through MLIR ###
@@ -116,7 +126,7 @@ $llc $opt_lvl $out_dir/$src_name.ll -o $out_dir/$src_name.s
 printf "$fmt_list" "Compiled using:" "LLC"
 
 # Assemble
-$clang $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out -lm
+$clang -no-pie $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.out -lm
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
@@ -135,9 +145,7 @@ sleep $gc_time
 printf "$fmt_start_nl" "Running:" "GCC"
 echo "--- GCC ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  $out_dir/$src_name\_gcc.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  $out_dir/$src_name\_gcc.out >> $timings
 done
 
 # Clang
@@ -147,9 +155,7 @@ sleep $gc_time
 printf "$fmt_list" "Running:" "Clang"
 echo -e "\n--- Clang ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  $out_dir/$src_name\_clang.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  $out_dir/$src_name\_clang.out >> $timings
 done
 
 # MLIR
@@ -159,9 +165,7 @@ sleep $gc_time
 printf "$fmt_list" "Running:" "MLIR"
 echo -e "\n--- MLIR ---" >> $timings
 for i in $(seq 1 $repetitions); do
-  ts=$(date +%s%N)
-  $out_dir/$src_name\_mlir.out
-  echo $((($(date +%s%N) - $ts)/1000000)) >> $timings
+  $out_dir/$src_name\_mlir.out >> $timings
 done
 
 # SDFG OPT
@@ -170,6 +174,5 @@ sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $python run.py $out_dir/$src_name\_opt.sdfg >> $timings
-done
+$python run.py $out_dir/$src_name\_opt.sdfg
+$python eval.py >> $timings

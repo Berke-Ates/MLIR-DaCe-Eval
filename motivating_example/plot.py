@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 
 
-def add_median_labels(ax, precision='.1f'):
+def add_median_labels(ax, precision='.2f'):
     lines = ax.get_lines()
     boxes = [c for c in ax.get_children() if type(c).__name__ == 'PathPatch']
     lines_per_box = int(len(lines) / len(boxes))
@@ -14,7 +14,7 @@ def add_median_labels(ax, precision='.1f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y,
+                       y + 20,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -31,7 +31,7 @@ dt = pd.read_csv("timings/timings.csv")
 sns.set(style="darkgrid")
 sns.set(font_scale=1.5)
 
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(8, 6))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes

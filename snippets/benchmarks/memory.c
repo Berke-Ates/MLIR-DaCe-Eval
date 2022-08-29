@@ -10,8 +10,6 @@
 
 // https://github.com/RRZE-HPC/TheBandwidthBenchmark/blob/master/src/main.c
 
-bool check(double *, double *, double *, double *, int);
-
 int main(int argc, char **argv)
 {
   int SIZE = 800000;
@@ -92,5 +90,11 @@ int main(int argc, char **argv)
 
   // return check(a, b, c, d, N);
 
-  return a[0];
+  double res = a[0];
+  free(a);
+  free(b);
+  free(c);
+  free(d);
+
+  return res;
 }
