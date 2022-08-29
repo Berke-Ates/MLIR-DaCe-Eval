@@ -22,4 +22,10 @@ auto_optimize(sdfg, dace.DeviceType.CPU)
 # sdfg.apply_transformations_repeated([TrivialTaskletElimination])
 # auto_optimize(sdfg, dace.DeviceType.CPU)
 
+for node, parent in sdfg.all_nodes_recursive():
+    if isinstance(node, dace.nodes.MapEntry):
+        node.schedule = dace.ScheduleType.Sequential
+
+sdfg.instrument = dace.InstrumentationType.Timer
+
 sdfg.save(sys.argv[1])
