@@ -3,13 +3,14 @@
 # Usage: ./run.sh <c file>
 
 ### Settings ###
-flags="-fPIC -O3 -march=native"
+flags="-fPIC -O2 -march=native"
 out_dir=./out
 repetitions=100
 gc_time=1
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_cpu_args="$flags"
+export DACE_debugprint=verbose
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 clang=$(which clang)                     || clang="NOT FOUND"

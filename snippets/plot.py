@@ -44,21 +44,16 @@ dt = pd.read_csv(sys.argv[1])
 sns.set(style="darkgrid")
 sns.set(font_scale=1.5)
 
-xSize = 3
-ySize = 5
-
-plt.figure(figsize=(xSize, ySize))
-
-color = ['green', 'green', 'green', 'red']
-box_plot = sns.barplot(data=dt, palette=color)
+plt.figure(figsize=(8, 4))
+box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
 ax.set_title(sys.argv[3])
-ax.set(ylabel='runtime (ms)')
+ax.set(ylabel='Runtime [ms]')
 
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
-# add_median_labels(ax)
+add_median_labels(ax)
 # change_width(ax, .5)
 
 plt.tight_layout()
