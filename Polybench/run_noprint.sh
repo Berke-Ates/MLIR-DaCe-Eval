@@ -209,6 +209,6 @@ sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-$python run_noprint.py $out_dir/$src_name\_opt.sdfg 2> /dev/null
+$python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions 2> /dev/null
 $python eval.py >> $timings
 
