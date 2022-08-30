@@ -170,7 +170,7 @@ elif [[ "$src_name" == "gemver" ]]; then
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 else
   $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  $sdfg_translate --mlir-to-sdfg symm_sdfg_man_opt.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
 
