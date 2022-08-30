@@ -147,9 +147,20 @@ $clang $opt_lvl $flags $out_dir/$src_name.s $driver -o $out_dir/$src_name\_mlir.
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
-$sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
-printf "$fmt_list" "Compiled:" "Optimized SDFG"
+if [[ "$src_name" == "durbin" ]]; then
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
+elif [[ "$src_name" == "gemver" ]]; then
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
+else
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  printf "$fmt_list" "Compiled:" "Optimized SDFG"
+fi
+
 
 # Run benchmark
 timings=$out_dir/timings.txt
