@@ -167,7 +167,7 @@ sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Non-Opt"
 echo -e "\n--- SDFG NOOPT ---" >> $timings
-$python run.py $out_dir/$src_name\_noopt.sdfg >> $timings
+$python run.py $out_dir/$src_name\_noopt.sdfg $repetitions
 $python eval.py >> $timings
 
 printf "$fmt_list" "Waiting for GC"
