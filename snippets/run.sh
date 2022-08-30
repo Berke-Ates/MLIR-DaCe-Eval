@@ -3,11 +3,12 @@
 # Usage: ./run.sh <c file>
 
 ### Settings ###
-flags="-fPIC -O2 -march=native"
+flags="-fPIC -O3 -march=native"
 out_dir=./out
 repetitions=10
 gc_time=10
 
+export DACE_compiler_cpu_executable="$(which gcc)"
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_cpu_args="$flags"
 export DACE_instrumentation_report_each_invocation=0
@@ -130,8 +131,8 @@ $clang -no-pie $opt_lvl $flags $out_dir/$src_name.s -o $out_dir/$src_name\_mlir.
 printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
-$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir \
-| $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
+$sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
+$sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
 
 ### Run benchmark ###
