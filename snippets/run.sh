@@ -8,9 +8,9 @@ out_dir=./out
 repetitions=10
 gc_time=10
 
-export DACE_compiler_cpu_executable="$(which g++)"
-export CC=`which gcc`
-export CXX=`which g++`
+export DACE_compiler_cpu_executable="$(which clang++)"
+export CC=`which clang`
+export CXX=`which clang++`
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_compiler_cpu_args="$flags"
 export DACE_instrumentation_report_each_invocation=0

@@ -2,7 +2,7 @@
 
 # Usage: ./run_all.sh
 
-benchmarks=("memory" "mem_line")
+benchmarks=("memory" "mem_line" "congrad_multi_field")
 
 for i in ${!benchmarks[@]}; do
   ./run.sh ./benchmarks/${benchmarks[$i]}.c
