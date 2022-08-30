@@ -6,14 +6,14 @@
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
 flags="-DLARGE_DATASET -DDATA_TYPE_IS_DOUBLE -fPIC -march=native"
-opt_lvl=-O2
+opt_lvl=-O3
 out_dir=./out
 repetitions=$2
 gc_time=10
 
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_instrumentation_report_each_invocation=0
-export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
+export DACE_compiler_cpu_args="-fPIC -O3 -march=native"
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -81,6 +81,11 @@ src_name=$(basename ${src%.*})
 src_ext=${src##*.}
 src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
+
+if [[ "$src_name" == "gramschmidt" ]]; then
+  opt_lvl=-O2
+  export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
+fi
 
 # Generate executables
 $gcc -I $util_folder $opt_lvl $flags -DPOLYBENCH_TIME -o $out_dir/$src_name\_gcc.out $src $driver -lm
