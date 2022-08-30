@@ -175,5 +175,5 @@ sleep $gc_time
 
 printf "$fmt_list" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-$python run.py $out_dir/$src_name\_opt.sdfg
+$python run.py $out_dir/$src_name\_opt.sdfg $repetitions
 $python eval.py >> $timings
