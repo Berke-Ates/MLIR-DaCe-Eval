@@ -8,7 +8,7 @@ import dace
 sdfg = dace.SDFG.from_file(sys.argv[1])
 obj = sdfg.compile()
 
-for i in range(1):
+for i in range(3):
     argDict = {}
 
     for argName, argType in sdfg.arglist().items():
