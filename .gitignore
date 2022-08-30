@@ -18,3 +18,6 @@
 
 # MILC
 milc_qcd/*
+
+# Polybench SDFG reference
+oopsla-polybench-performance/*
