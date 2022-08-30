@@ -11,10 +11,11 @@ out_dir=./out
 repetitions=$2
 gc_time=10
 
-export DACE_compiler_cpu_executable="$(which clang)"
+export DACE_compiler_cpu_executable="$(which g++)"
 export DACE_compiler_cpu_openmp_sections=0
 export DACE_instrumentation_report_each_invocation=0
 export DACE_compiler_cpu_args="-fPIC -O3 -march=native"
+# export DACE_debugprint=verbose
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -215,6 +216,6 @@ sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "SDFG Opt"
 echo -e "\n--- SDFG OPT ---" >> $timings
-$python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions 2> /dev/null
+$python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
 $python eval.py >> $timings
 
