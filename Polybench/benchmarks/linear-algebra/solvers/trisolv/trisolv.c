@@ -79,6 +79,10 @@ static void kernel_trisolv(int n,
 
 int main(int argc, char **argv)
 {
+
+  /* Start timer. */
+  polybench_start_instruments;
+
   /* Retrieve problem size. */
   int n = N;
 
@@ -90,15 +94,8 @@ int main(int argc, char **argv)
   /* Initialize array(s). */
   init_array(n, POLYBENCH_ARRAY(L), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(b));
 
-  /* Start timer. */
-  polybench_start_instruments;
-
   /* Run kernel. */
   kernel_trisolv(n, POLYBENCH_ARRAY(L), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(b));
-
-  /* Stop and print timer. */
-  polybench_stop_instruments;
-  polybench_print_instruments;
 
   /* Prevent dead-code elimination. All live-out data must be printed
      by the function call in argument. */
@@ -108,6 +105,10 @@ int main(int argc, char **argv)
   POLYBENCH_FREE_ARRAY(L);
   POLYBENCH_FREE_ARRAY(x);
   POLYBENCH_FREE_ARRAY(b);
+
+  /* Stop and print timer. */
+  polybench_stop_instruments;
+  polybench_print_instruments;
 
   return 0;
 }

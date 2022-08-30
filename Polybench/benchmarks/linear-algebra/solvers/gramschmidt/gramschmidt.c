@@ -117,6 +117,9 @@ static void kernel_gramschmidt(int m, int n,
 
 int main(int argc, char **argv)
 {
+  /* Start timer. */
+  polybench_start_instruments;
+
   /* Retrieve problem size. */
   int m = M;
   int n = N;
@@ -132,18 +135,11 @@ int main(int argc, char **argv)
              POLYBENCH_ARRAY(R),
              POLYBENCH_ARRAY(Q));
 
-  /* Start timer. */
-  polybench_start_instruments;
-
   /* Run kernel. */
   kernel_gramschmidt(m, n,
                      POLYBENCH_ARRAY(A),
                      POLYBENCH_ARRAY(R),
                      POLYBENCH_ARRAY(Q));
-
-  /* Stop and print timer. */
-  polybench_stop_instruments;
-  polybench_print_instruments;
 
   /* Prevent dead-code elimination. All live-out data must be printed
      by the function call in argument. */
@@ -153,6 +149,10 @@ int main(int argc, char **argv)
   POLYBENCH_FREE_ARRAY(A);
   POLYBENCH_FREE_ARRAY(R);
   POLYBENCH_FREE_ARRAY(Q);
+
+  /* Stop and print timer. */
+  polybench_stop_instruments;
+  polybench_print_instruments;
 
   return 0;
 }

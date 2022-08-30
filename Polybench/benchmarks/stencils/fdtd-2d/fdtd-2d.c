@@ -120,6 +120,9 @@ static void kernel_fdtd_2d(int tmax,
 
 int main(int argc, char **argv)
 {
+  /* Start timer. */
+  polybench_start_instruments;
+
   /* Retrieve problem size. */
   int tmax = TMAX;
   int nx = NX;
@@ -138,19 +141,12 @@ int main(int argc, char **argv)
              POLYBENCH_ARRAY(hz),
              POLYBENCH_ARRAY(_fict_));
 
-  /* Start timer. */
-  polybench_start_instruments;
-
   /* Run kernel. */
   kernel_fdtd_2d(tmax, nx, ny,
                  POLYBENCH_ARRAY(ex),
                  POLYBENCH_ARRAY(ey),
                  POLYBENCH_ARRAY(hz),
                  POLYBENCH_ARRAY(_fict_));
-
-  /* Stop and print timer. */
-  polybench_stop_instruments;
-  polybench_print_instruments;
 
   /* Prevent dead-code elimination. All live-out data must be printed
      by the function call in argument. */
@@ -163,6 +159,10 @@ int main(int argc, char **argv)
   POLYBENCH_FREE_ARRAY(ey);
   POLYBENCH_FREE_ARRAY(hz);
   POLYBENCH_FREE_ARRAY(_fict_);
+
+  /* Stop and print timer. */
+  polybench_stop_instruments;
+  polybench_print_instruments;
 
   return 0;
 }
