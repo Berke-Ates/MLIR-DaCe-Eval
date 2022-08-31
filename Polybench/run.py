@@ -60,7 +60,7 @@ for argName, argType in sdfg.arglist().items():
     argDict[argName] = arr
 
 start_time = time.time()
-obj(**argDict)
+obj(_argcount=43, **argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 
