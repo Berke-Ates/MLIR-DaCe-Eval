@@ -19,7 +19,7 @@ sdfg = SDFG.from_json(json.load(sys.stdin))
 sdfg.validate()
 
 for i in range(5):
-    promote_scalars_to_symbols(sdfg)
+    # promote_scalars_to_symbols(sdfg)
     OptionalArrayInference().apply_pass(sdfg, dict())
     ConstantPropagation().apply_pass(sdfg, dict())
     sdfg.apply_transformations_repeated([StateFusion])
