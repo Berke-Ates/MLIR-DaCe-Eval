@@ -6,13 +6,18 @@
 util_folder=./benchmarks/utilities
 driver=./benchmarks/utilities/polybench.c
 flags="-DMINI_DATASET -DDATA_TYPE_IS_DOUBLE -DPOLYBENCH_DUMP_ARRAYS -fPIC -march=native"
-opt_lvl=-O2
+opt_lvl=-O3
 out_dir=./out
 repetitions=$2
 gc_time=1
 
+export DACE_compiler_cpu_executable="$(which g++)"
+export CC=`which gcc`
+export CXX=`which g++`
 export DACE_compiler_cpu_openmp_sections=0
-export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
+export DACE_instrumentation_report_each_invocation=0
+export DACE_compiler_cpu_args="-fPIC -O3 -march=native"
+# export DACE_debugprint=verbose
 
 gcc=$(which gcc)                         || gcc="NOT FOUND"
 gpp=$(which g++)                         || gpp="NOT FOUND"
@@ -81,6 +86,11 @@ src_ext=${src##*.}
 src_dir=$(dirname $src)
 printf "$fmt_start_nl" "Source:" "$src_name ($src)"
 
+if [[ "$src_name" == "gramschmidt" ]]; then
+  opt_lvl=-O2
+  export DACE_compiler_cpu_args="-fPIC -O2 -march=native"
+fi
+
 # Generate executables
 $gcc -I $util_folder $opt_lvl $flags -o $out_dir/$src_name\_gcc.out $src $driver -lm
 printf "$fmt_list" "Generated:" "GCC"
@@ -148,15 +158,15 @@ printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
 if [[ "$src_name" == "durbin" ]]; then
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
   $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 elif [[ "$src_name" == "gemver" ]]; then
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
   $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 else
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
   $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
