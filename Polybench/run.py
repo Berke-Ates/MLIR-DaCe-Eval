@@ -18,9 +18,9 @@ def printArray(arr, offset, depth):
 
 
 def printDoitgen(arr):
-    NR = 150
-    NQ = 140
-    NP = 160
+    NQ = 8
+    NR = 10
+    NP = 12
     for i in range(NR):
         for j in range(NQ):
             for k in range(NP):
@@ -56,19 +56,11 @@ obj = sdfg.compile()
 argDict = {}
 
 for argName, argType in sdfg.arglist().items():
-    print(argName)
-    # if argName == "argv_loc":
-    #     arr = dace.ndarray(shape=(43, ), dtype=argType.dtype)
-    #     argDict[argName] = arr
-    # else:
-    #     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
-    #     argDict[argName] = arr
-
-argv_loc = dace.ndarray(shape=(43, ), dtype=argType.dtype)
-# argDict["argv"] = argv_loc
+    arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
+    argDict[argName] = arr
 
 start_time = time.time()
-obj(argv_loc=argv_loc, _argcount=43, argc=43)
+obj(**argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 
@@ -78,9 +70,10 @@ for argName, arr in argDict.items():
         printCholesky(arr)
     elif "gramschmidt" in sys.argv[1]:
         printGramschmidt(arr, argName == "_arg1")
-    else:
-        # printArray(arr, 0, len(arr.shape))
+    elif "doitgen" in sys.argv[1]:
         printDoitgen(arr)
+    else:
+        printArray(arr, 0, len(arr.shape))
 
     print("\nend   dump: %s" % argName, file=sys.stderr)
 

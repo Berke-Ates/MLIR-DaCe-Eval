@@ -16,9 +16,9 @@ sdfg = SDFG.from_json(json.load(sys.stdin))
 sdfg.validate()
 
 # promote_scalars_to_symbols(sdfg, integers_only=False)
-# sdfg.simplify()
-# move_small_arrays_to_stack(sdfg)
-# auto_optimize(sdfg, dace.DeviceType.CPU)
+sdfg.simplify()
+move_small_arrays_to_stack(sdfg)
+auto_optimize(sdfg, dace.DeviceType.CPU)
 # sdfg.apply_transformations_repeated([TrivialTaskletElimination])
 # auto_optimize(sdfg, dace.DeviceType.CPU)
 
