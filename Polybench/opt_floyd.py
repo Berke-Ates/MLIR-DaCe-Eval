@@ -18,13 +18,13 @@ print("   Using DaCe from: %s" % dace.__file__)
 sdfg = SDFG.from_json(json.load(sys.stdin))
 sdfg.validate()
 
-# for i in range(5):
-#     promote_scalars_to_symbols(sdfg)
-#     OptionalArrayInference().apply_pass(sdfg, dict())
-#     ConstantPropagation().apply_pass(sdfg, dict())
-#     sdfg.apply_transformations_repeated([StateFusion])
+for i in range(5):
+    promote_scalars_to_symbols(sdfg)
+    OptionalArrayInference().apply_pass(sdfg, dict())
+    ConstantPropagation().apply_pass(sdfg, dict())
+    sdfg.apply_transformations_repeated([StateFusion])
 
-sdfg.simplify()
+# sdfg.simplify()
 move_small_arrays_to_stack(sdfg)
 # auto_optimize(sdfg, dace.DeviceType.CPU)
 # sdfg.apply_transformations_repeated([TrivialTaskletElimination])
