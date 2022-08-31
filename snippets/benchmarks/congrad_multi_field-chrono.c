@@ -45,6 +45,29 @@ int main()
 
   converged = (int *)malloc(Norder * sizeof(int));
 
+  // For benchmark
+  iteration = 0;
+  rsq = 1;
+  rsqnew = 1;
+  source_norm = 1;
+  rsqmin = 1;
+  rsqstop = 1;
+  c1 = 1;
+  c2 = 1;
+  cd = 1;
+  for (i = 0; i < Norder; i++)
+  {
+    // zeta_i[i] = 0;
+    // zeta_im1[i] = 0;
+    zeta_ip1[i] = 0;
+    beta_i[i] = 0;
+    // beta_im1[i] = 0;
+    // alpha[i] = 0;
+    floatvarj[i] = 0;
+    floatvark[i] = 0;
+  }
+  // -----------------
+
   for (i = 0; i < Norder; i++)
     converged[i] = 0;
 
@@ -65,6 +88,10 @@ int main()
 
   /* beta_i[0]= - (r,r)/(pm,Mpm)  */
   cd = 0.0;
+
+  // For benchmark
+  cd = 1;
+  // -----------------
 
   beta_i[0] = -rsq / cd;
 
