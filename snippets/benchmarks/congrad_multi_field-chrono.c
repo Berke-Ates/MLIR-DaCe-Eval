@@ -201,5 +201,5 @@ int main()
   clock_t diff = clock() - start;
   printf("%lf\n", ((double)diff * 1000) / CLOCKS_PER_SEC);
 
-  return iteration;
+  return rsq;
 }

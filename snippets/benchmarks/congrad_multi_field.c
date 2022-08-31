@@ -196,5 +196,5 @@ int main()
 
   free(shift);
 
-  return iteration;
+  return rsq;
 }
