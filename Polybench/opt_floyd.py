@@ -26,7 +26,7 @@ sdfg.validate()
 
 sdfg.simplify()
 move_small_arrays_to_stack(sdfg)
-auto_optimize(sdfg, dace.DeviceType.CPU)
+# auto_optimize(sdfg, dace.DeviceType.CPU)
 # sdfg.apply_transformations_repeated([TrivialTaskletElimination])
 
 # auto_optimize(sdfg, dace.DeviceType.CPU)
