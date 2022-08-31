@@ -71,8 +71,8 @@ for argName, arr in argDict.items():
     elif "gramschmidt" in sys.argv[1]:
         printGramschmidt(arr, argName == "_arg1")
     else:
-        printArray(arr, 0, len(arr.shape))
-    # printDoitgen(arr)
+        # printArray(arr, 0, len(arr.shape))
+        printDoitgen(arr)
 
     print("\nend   dump: %s" % argName, file=sys.stderr)
 

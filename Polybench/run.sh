@@ -170,8 +170,9 @@ elif [[ "$src_name" == "floyd-warshall" ]]; then
   $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (Floyd-Warshall)"
 else
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  cat doitgen_mattermost.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
 
