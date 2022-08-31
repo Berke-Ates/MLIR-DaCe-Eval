@@ -18,9 +18,9 @@ def printArray(arr, offset, depth):
 
 
 def printDoitgen(arr):
-    NR = 10
-    NQ = 8
-    NP = 12
+    NR = 150
+    NQ = 140
+    NP = 160
     for i in range(NR):
         for j in range(NQ):
             for k in range(NP):
