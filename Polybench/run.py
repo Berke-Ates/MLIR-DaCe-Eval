@@ -56,6 +56,8 @@ obj = sdfg.compile()
 argDict = {}
 
 for argName, argType in sdfg.arglist().items():
+    print(argName)
+    print(argType)
     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
     argDict[argName] = arr
 
