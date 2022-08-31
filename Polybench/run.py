@@ -56,7 +56,7 @@ obj = sdfg.compile()
 argDict = {}
 
 for argName, argType in sdfg.arglist().items():
-    if argName is "argv_loc":
+    if argName == "argv_loc":
         arr = dace.ndarray(shape=(43, ), dtype=argType.dtype)
         argDict[argName] = arr
     else:
