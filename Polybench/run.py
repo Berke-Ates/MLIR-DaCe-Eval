@@ -59,16 +59,21 @@ for argName, argType in sdfg.arglist().items():
     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
     argDict[argName] = arr
 
+start_time = time.time()
 obj(**argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 
 for argName, arr in argDict.items():
     print("begin dump: %s" % argName, end='', file=sys.stderr)
-    printArray(arr, 0, len(arr.shape))
-    # printCholesky(arr)
+    if "cholesky" in sys.argv[1]:
+        printCholesky(arr)
+    elif "gramschmidt" in sys.argv[1]:
+        printGramschmidt(arr, argName == "_arg1")
+    else:
+        printArray(arr, 0, len(arr.shape))
     # printDoitgen(arr)
-    # printGramschmidt(arr, argName == "_arg1")
+
     print("\nend   dump: %s" % argName, file=sys.stderr)
 
 print("==END   DUMP_ARRAYS==", file=sys.stderr)
