@@ -65,7 +65,7 @@ for argName, argType in sdfg.arglist().items():
     #     argDict[argName] = arr
 
 argv_loc = dace.ndarray(shape=(43, ), dtype=argType.dtype)
-argDict["argv"] = argv_loc
+# argDict["argv"] = argv_loc
 
 start_time = time.time()
 obj(argv_loc=argv_loc, _argcount=43, argc=43)
