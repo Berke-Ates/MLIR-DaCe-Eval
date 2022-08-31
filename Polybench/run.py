@@ -55,14 +55,13 @@ obj = sdfg.compile()
 
 argDict = {}
 
-_argcount = dace.symbol('_argcount', dtype=dace.int64)
-_argcount = 43
-
 for argName, argType in sdfg.arglist().items():
-    print(argName)
-    print(argType)
-    arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
-    argDict[argName] = arr
+    if argName is "argv_loc":
+        arr = dace.ndarray(shape=(43, ), dtype=argType.dtype)
+        argDict[argName] = arr
+    else:
+        arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
+        argDict[argName] = arr
 
 start_time = time.time()
 obj(**argDict)
