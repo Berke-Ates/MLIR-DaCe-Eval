@@ -55,17 +55,17 @@ obj = sdfg.compile()
 
 argDict = {}
 
+_argcount = dace.symbol('_argcount', dtype=dace.int64)
+_argcount = 43
+
 for argName, argType in sdfg.arglist().items():
     print(argName)
     print(argType)
     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
     argDict[argName] = arr
 
-_argcount = dace.symbol('_argcount', dtype=dace.int64)
-_argcount = 43
-
 start_time = time.time()
-obj(_argcount=_argcount, **argDict)
+obj(**argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)
 
