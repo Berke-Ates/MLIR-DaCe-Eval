@@ -59,7 +59,6 @@ for argName, argType in sdfg.arglist().items():
     arr = dace.ndarray(shape=argType.shape, dtype=argType.dtype)
     argDict[argName] = arr
 
-start_time = time.time()
 obj(**argDict)
 
 print("==BEGIN DUMP_ARRAYS==", file=sys.stderr)

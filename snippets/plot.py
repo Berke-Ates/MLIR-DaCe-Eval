@@ -15,7 +15,7 @@ def add_median_labels(ax, precision='.1f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 300,
+                       y + 0.1,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
