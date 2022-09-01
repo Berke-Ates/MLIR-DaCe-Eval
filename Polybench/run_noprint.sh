@@ -176,9 +176,9 @@ elif [[ "$src_name" == "floyd-warshall" ]]; then
   cat c2dace/$src_name-promoted-notfused.sdfg | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (Floyd-Warshall)"
 else
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
-  # cat c2dace/$src_name-promoted-notfused.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-promoted-notfused.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
 
@@ -221,20 +221,20 @@ touch $timings
 
 ### SDFG ###
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_start_nl" "Running:" "SDFG"
-echo -e "\n--- SDFG OPT ---" >> $timings
-$python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
-$python eval.py >> $timings
-
-### C2DaCe ###
-
 # printf "$fmt_list" "Waiting for GC"
 # sleep $gc_time
 
-# printf "$fmt_start_nl" "Running:" "C2DaCe"
-# echo -e "\n--- C2DaCe ---" >> $timings
-# $python run_c2dace.py $out_dir/$src_name\_opt.sdfg $repetitions
+# printf "$fmt_start_nl" "Running:" "SDFG"
+# echo -e "\n--- SDFG OPT ---" >> $timings
+# $python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
 # $python eval.py >> $timings
+
+### C2DaCe ###
+
+printf "$fmt_list" "Waiting for GC"
+sleep $gc_time
+
+printf "$fmt_start_nl" "Running:" "C2DaCe"
+echo -e "\n--- C2DaCe ---" >> $timings
+$python run_c2dace.py $out_dir/$src_name\_opt.sdfg $repetitions
+$python eval.py >> $timings
