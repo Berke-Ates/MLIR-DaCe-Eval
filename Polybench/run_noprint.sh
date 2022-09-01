@@ -163,22 +163,22 @@ printf "$fmt_list" "Assembled using:" "Clang"
 if [[ "$src_name" == "durbin" ]]; then
   # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
   # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
-  cat c2dace/$src_name-untransformed.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-promoted-notfused.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 elif [[ "$src_name" == "gemver" ]]; then
   # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
   # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
-  cat c2dace/$src_name-untransformed.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-promoted-notfused.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 elif [[ "$src_name" == "floyd-warshall" ]]; then
   # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
   # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
-  cat c2dace/$src_name-untransformed.sdfg | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-promoted-notfused.sdfg | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (Floyd-Warshall)"
 else
   # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
   # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
-  cat c2dace/$src_name-untransformed.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-promoted-notfused.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
 
