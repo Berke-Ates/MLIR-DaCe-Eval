@@ -5,7 +5,7 @@
 ### Settings ###
 flags="-fPIC -O3 -march=native"
 out_dir=./out
-repetitions=1
+repetitions=10
 gc_time=10
 
 export DACE_compiler_cpu_executable="$(which clang++)"
@@ -189,5 +189,5 @@ sleep $gc_time
 
 printf "$fmt_list" "Running:" "C2DaCe"
 echo -e "\n--- C2DaCe ---" >> $timings
-$python run.py $out_dir/$src_name\_c2dace.sdfg $repetitions
+$python run_c2dace.py $out_dir/$src_name\_c2dace.sdfg $repetitions
 $python eval.py >> $timings
