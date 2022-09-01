@@ -236,5 +236,5 @@ sleep $gc_time
 
 printf "$fmt_start_nl" "Running:" "C2DaCe"
 echo -e "\n--- C2DaCe ---" >> $timings
-$python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
+$python run_c2dace.py $out_dir/$src_name\_opt.sdfg $repetitions
 $python eval.py >> $timings
