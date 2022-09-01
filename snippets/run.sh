@@ -137,7 +137,7 @@ $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_s
 $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
 
-cat c2dace/$src_name.sdfg $python opt.py $out_dir/$src_name\__c2dace.sdfg
+cat c2dace/$src_name.sdfg | $python opt.py $out_dir/$src_name\__c2dace.sdfg
 printf "$fmt_list" "Compiled:" "Optimized C2DaCe"
 
 ### Run benchmark ###
