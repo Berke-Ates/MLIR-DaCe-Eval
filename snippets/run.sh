@@ -5,7 +5,7 @@
 ### Settings ###
 flags="-fPIC -O3 -march=native"
 out_dir=./out
-repetitions=10
+repetitions=1
 gc_time=10
 
 export DACE_compiler_cpu_executable="$(which clang++)"
@@ -137,45 +137,57 @@ $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt.mlir > $out_dir/$src_name\_s
 $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
 printf "$fmt_list" "Compiled:" "Optimized SDFG"
 
+cat c2dace/$src_name.sdfg $python opt.py $out_dir/$src_name\__c2dace.sdfg
+printf "$fmt_list" "Compiled:" "Optimized C2DaCe"
+
 ### Run benchmark ###
 timings=$out_dir/timings.txt
 touch $timings
 
 # GCC
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "GCC"
-echo "--- GCC ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_gcc.out >> $timings
-done
+# printf "$fmt_start_nl" "Running:" "GCC"
+# echo "--- GCC ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_gcc.out >> $timings
+# done
 
 # Clang
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_list" "Running:" "Clang"
-echo -e "\n--- Clang ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_clang.out >> $timings
-done
+# printf "$fmt_list" "Running:" "Clang"
+# echo -e "\n--- Clang ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_clang.out >> $timings
+# done
 
 # MLIR
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_list" "Running:" "MLIR"
-echo -e "\n--- MLIR ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_mlir.out >> $timings
-done
+# printf "$fmt_list" "Running:" "MLIR"
+# echo -e "\n--- MLIR ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_mlir.out >> $timings
+# done
 
 # SDFG OPT
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_list" "Running:" "SDFG Opt"
+# echo -e "\n--- SDFG OPT ---" >> $timings
+# $python run.py $out_dir/$src_name\_opt.sdfg $repetitions
+# $python eval.py >> $timings
+
+# C2DaCe
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
 
-printf "$fmt_list" "Running:" "SDFG Opt"
-echo -e "\n--- SDFG OPT ---" >> $timings
-$python run.py $out_dir/$src_name\_opt.sdfg $repetitions
+printf "$fmt_list" "Running:" "C2DaCe"
+echo -e "\n--- C2DaCe ---" >> $timings
+$python run.py $out_dir/$src_name\_c2dace.sdfg $repetitions
 $python eval.py >> $timings
