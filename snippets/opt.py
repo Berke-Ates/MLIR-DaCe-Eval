@@ -15,7 +15,7 @@ sdfg.validate()
 
 sdfg.simplify()
 move_small_arrays_to_stack(sdfg)
-auto_optimize(sdfg, dace.DeviceType.CPU)
+# auto_optimize(sdfg, dace.DeviceType.CPU)
 
 for node, parent in sdfg.all_nodes_recursive():
     if isinstance(node, dace.nodes.MapEntry):
