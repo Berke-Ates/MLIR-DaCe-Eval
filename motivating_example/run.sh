@@ -139,50 +139,62 @@ $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_noopt.mlir \
 | $sdfg_translate --mlir-to-sdfg | $python opt.py $out_dir/$src_name\_noopt.sdfg
 printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
 
+cat loop-c2dace.sdfg | $python opt_noauto.py $out_dir/$src_name\_c2dace.sdfg
+printf "$fmt_list" "Compiled:" "Non-Optimized SDFG"
+
 # Run benchmark
 timings=$out_dir/timings.txt
 touch $timings
 
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_start_nl" "Running:" "GCC"
+# echo "--- GCC ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_gcc.out >> $timings
+# done
+
+
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_list" "Running:" "Clang"
+# echo -e "\n--- Clang ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_clang.out >> $timings
+# done
+
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_list" "Running:" "SDFG Non-Opt"
+# echo -e "\n--- SDFG NOOPT ---" >> $timings
+# $python run.py $out_dir/$src_name\_noopt.sdfg $repetitions
+# $python eval.py >> $timings
+
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_list" "Running:" "MLIR"
+# echo -e "\n--- MLIR ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   $out_dir/$src_name\_mlir.out >> $timings
+# done
+
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_list" "Running:" "SDFG Opt"
+# echo -e "\n--- SDFG OPT ---" >> $timings
+# $python run.py $out_dir/$src_name\_opt.sdfg $repetitions
+# $python eval.py >> $timings
+
+
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "GCC"
-echo "--- GCC ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_gcc.out >> $timings
-done
-
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "Clang"
-echo -e "\n--- Clang ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_clang.out >> $timings
-done
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "SDFG Non-Opt"
-echo -e "\n--- SDFG NOOPT ---" >> $timings
-$python run.py $out_dir/$src_name\_noopt.sdfg $repetitions
-$python eval.py >> $timings
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "MLIR"
-echo -e "\n--- MLIR ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  $out_dir/$src_name\_mlir.out >> $timings
-done
-
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
-
-printf "$fmt_list" "Running:" "SDFG Opt"
-echo -e "\n--- SDFG OPT ---" >> $timings
-$python run.py $out_dir/$src_name\_opt.sdfg $repetitions
+printf "$fmt_list" "Running:" "C2DaCe"
+echo -e "\n--- C2DaCe ---" >> $timings
+$python run_c2dace.py $out_dir/$src_name\_c2dace.sdfg $repetitions
 $python eval.py >> $timings
