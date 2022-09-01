@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 
 
-def add_median_labels(ax, precision='.1f'):
+def add_median_labels(ax, precision='.2f'):
     lines = ax.get_lines()
     boxes = [c for c in ax.get_children() if type(c).__name__ == 'PathPatch']
     lines_per_box = int(len(lines) / len(boxes))
@@ -20,12 +20,13 @@ def add_median_labels(ax, precision='.1f'):
                        ha='center',
                        va='bottom',
                        fontweight='bold',
-                       color='white')
+                       color='black',
+                       fontfamily='Arial')
         # create median-colored border around white text for contrast
-        text.set_path_effects([
-            path_effects.Stroke(linewidth=2, foreground=median.get_color()),
-            path_effects.Normal(),
-        ])
+        # text.set_path_effects([
+        #     path_effects.Stroke(linewidth=2, foreground=median.get_color()),
+        #     path_effects.Normal(),
+        # ])
 
 
 def change_width(ax, new_value):

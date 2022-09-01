@@ -19,12 +19,13 @@ def add_median_labels(ax, precision='.2f'):
                        ha='center',
                        va='bottom',
                        fontweight='bold',
-                       color='white')
+                       color='black',
+                       fontfamily='Arial')
         # create median-colored border around white text for contrast
-        text.set_path_effects([
-            path_effects.Stroke(linewidth=2, foreground=median.get_color()),
-            path_effects.Normal(),
-        ])
+        # text.set_path_effects([
+        #     path_effects.Stroke(linewidth=2, foreground=median.get_color()),
+        #     path_effects.Normal(),
+        # ])
 
 
 dt = pd.read_csv("timings/timings.csv")
