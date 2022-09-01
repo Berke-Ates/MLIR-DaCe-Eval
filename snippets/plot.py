@@ -15,7 +15,7 @@ def add_median_labels(ax, precision='.2f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 0.1,
+                       y + 50,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -43,7 +43,7 @@ def change_width(ax, new_value):
 
 dt = pd.read_csv(sys.argv[1])
 sns.set(style="darkgrid")
-sns.set(font_scale=1.5)
+sns.set(font_scale=1.25)
 
 plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
@@ -52,7 +52,7 @@ ax = box_plot.axes
 # ax.set_title(sys.argv[3])
 ax.set(ylabel='Runtime [ms]')
 
-ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+ax.set_xticklabels(["GCC", "Clang", "Polygeist\n+ MLIR", "DaCe", "DCIR"])
 
 add_median_labels(ax)
 # change_width(ax, .5)

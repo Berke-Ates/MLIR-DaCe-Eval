@@ -14,7 +14,7 @@ def add_median_labels(ax, precision='.2f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 20,
+                       y + 75,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -28,16 +28,16 @@ def add_median_labels(ax, precision='.2f'):
         # ])
 
 
-dt = pd.read_csv("timings/timings.csv")
+dt = pd.read_csv("timings/timings_clang.csv")
 sns.set(style="darkgrid")
-sns.set(font_scale=1.5)
+sns.set(font_scale=1.25)
 
 plt.figure(figsize=(8, 6))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
 ax.set(ylabel='Runtime [ms]')
-ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+ax.set_xticklabels(["GCC", "Clang", "Polygeist\n+ MLIR", "DaCe", "DCIR"])
 
 add_median_labels(ax)
 plt.tight_layout()
