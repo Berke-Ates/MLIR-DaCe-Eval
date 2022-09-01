@@ -161,20 +161,24 @@ printf "$fmt_list" "Assembled using:" "Clang"
 
 # Compile SDFG
 if [[ "$src_name" == "durbin" ]]; then
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-untransformed.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 elif [[ "$src_name" == "gemver" ]]; then
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-untransformed.sdfg | $python opt_noauto.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (No Auto)"
 elif [[ "$src_name" == "floyd-warshall" ]]; then
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-untransformed.sdfg | $python opt_floyd.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG (Floyd-Warshall)"
 else
-  $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
-  $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  # $sdfg_opt --convert-to-sdfg $out_dir/$src_name\_opt_sdfg.mlir > $out_dir/$src_name\_sdfg.mlir
+  # $sdfg_translate --mlir-to-sdfg $out_dir/$src_name\_sdfg.mlir | $python opt.py $out_dir/$src_name\_opt.sdfg
+  cat c2dace/$src_name-untransformed.sdfg | $python opt.py $out_dir/$src_name\_opt.sdfg
   printf "$fmt_list" "Compiled:" "Optimized SDFG"
 fi
 
@@ -184,44 +188,53 @@ touch $timings
 
 ### GCC ###
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "GCC"
-echo "--- GCC ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ./$out_dir/$src_name\_gcc.out >> $timings
-done
+# printf "$fmt_start_nl" "Running:" "GCC"
+# echo "--- GCC ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ./$out_dir/$src_name\_gcc.out >> $timings
+# done
 
 ### Clang ###
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "Clang"
-echo -e "\n--- Clang ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ./$out_dir/$src_name\_clang.out >> $timings
-done
+# printf "$fmt_start_nl" "Running:" "Clang"
+# echo -e "\n--- Clang ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ./$out_dir/$src_name\_clang.out >> $timings
+# done
 
 ### MLIR ###
 
-printf "$fmt_list" "Waiting for GC"
-sleep $gc_time
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "MLIR"
-echo -e "\n--- MLIR ---" >> $timings
-for i in $(seq 1 $repetitions); do
-  ./$out_dir/$src_name\_mlir.out >> $timings
-done
+# printf "$fmt_start_nl" "Running:" "MLIR"
+# echo -e "\n--- MLIR ---" >> $timings
+# for i in $(seq 1 $repetitions); do
+#   ./$out_dir/$src_name\_mlir.out >> $timings
+# done
 
 ### SDFG ###
 
+# printf "$fmt_list" "Waiting for GC"
+# sleep $gc_time
+
+# printf "$fmt_start_nl" "Running:" "SDFG"
+# echo -e "\n--- SDFG OPT ---" >> $timings
+# $python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
+# $python eval.py >> $timings
+
+### C2DaCe ###
+
 printf "$fmt_list" "Waiting for GC"
 sleep $gc_time
 
-printf "$fmt_start_nl" "Running:" "SDFG Opt"
-echo -e "\n--- SDFG OPT ---" >> $timings
+printf "$fmt_start_nl" "Running:" "C2DaCe"
+echo -e "\n--- C2DaCe ---" >> $timings
 $python run_noprint.py $out_dir/$src_name\_opt.sdfg $repetitions
 $python eval.py >> $timings
-
