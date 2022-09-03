@@ -3,7 +3,7 @@
 # Usage: ./plot.sh <txt timings file> <repetitions>
 
 # Settings
-labels=("GCC" "Clang" "Polygeist + MLIR" "MLIR-DaCe")
+labels=("GCC" "Clang" "DaCe" "Polygeist + MLIR" "DCIR")
 repetitions=$2
 timings_dir=./timings
 out_dir=./plots

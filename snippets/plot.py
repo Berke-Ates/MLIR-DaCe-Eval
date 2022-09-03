@@ -4,6 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 
+import matplotlib
+
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
+
 
 def add_median_labels(ax, precision='.2f'):
     lines = ax.get_lines()
@@ -52,7 +57,7 @@ ax = box_plot.axes
 # ax.set_title(sys.argv[3])
 ax.set(ylabel='Runtime [ms]')
 
-ax.set_xticklabels(["GCC", "Clang", "Polygeist\n+ MLIR", "DaCe", "DCIR"])
+ax.set_xticklabels(["GCC", "Clang", "DaCe", "Polygeist\n+ MLIR", "DCIR"])
 
 add_median_labels(ax)
 # change_width(ax, .5)
