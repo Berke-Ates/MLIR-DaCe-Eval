@@ -143,30 +143,36 @@ compile_with_dcir(){
   save_time "compile_with_dcir_conversion tmp_folder/opt.mlir tmp_folder/translated.sdfg" \
     $out_dir/$src_name/dcir/conversion.txt
 
-  $python opt_compile.py tmp_folder/translated.sdfg \
+  $python opt_compile_floyd.py tmp_folder/translated.sdfg \
   $out_dir/$src_name/dcir/dc_opt.txt $out_dir/$src_name/dcir/dace_compile.txt
 
   rm -r tmp_folder
 }
 
+# Redo nussinov + floyd-warshall
 benchmarks=$(find benchmarks/* -name '*.c' -not -path "benchmarks/utilities/*")
+
 for filename in $benchmarks; do
   src=$filename
   src_name=$(basename ${src%.*})
 
+  if [ "$src_name" != "floyd-warshall" ]; then
+    continue
+  fi
+
   mkdir -p $out_dir/$src_name
 
   ### GCC ###
-  mkdir -p $out_dir/$src_name/gcc
-  save_time "compile_with_gcc $src" $out_dir/$src_name/gcc/total.txt
+  # mkdir -p $out_dir/$src_name/gcc
+  # save_time "compile_with_gcc $src" $out_dir/$src_name/gcc/total.txt
   
-  ### Clang ###
-  mkdir -p $out_dir/$src_name/clang
-  save_time "compile_with_clang $src" $out_dir/$src_name/clang/total.txt
+  # ### Clang ###
+  # mkdir -p $out_dir/$src_name/clang
+  # save_time "compile_with_clang $src" $out_dir/$src_name/clang/total.txt
 
-  ### MLIR ###
-  mkdir -p $out_dir/$src_name/mlir
-  save_time "compile_with_mlir $src" $out_dir/$src_name/mlir/total.txt
+  # ### MLIR ###
+  # mkdir -p $out_dir/$src_name/mlir
+  # save_time "compile_with_mlir $src" $out_dir/$src_name/mlir/total.txt
 
   ### DCIR ###
   mkdir -p $out_dir/$src_name/dcir
