@@ -2,8 +2,6 @@ import torch
 import sys
 from pathlib import Path
 
-print(sys.path)
-
 from torch_mlir_e2e_test.mhlo_backends.linalg_on_tensors import LinalgOnTensorsMhloBackend
 
 compiled = Path('mish_llvm.mlir').read_text()
