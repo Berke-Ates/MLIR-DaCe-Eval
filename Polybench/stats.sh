@@ -143,7 +143,7 @@ compile_with_dcir(){
   save_time "compile_with_dcir_conversion tmp_folder/opt.mlir tmp_folder/translated.sdfg" \
     $out_dir/$src_name/dcir/conversion.txt
 
-  $python opt_compile_floyd.py tmp_folder/translated.sdfg \
+  $python opt_compile.py tmp_folder/translated.sdfg \
   $out_dir/$src_name/dcir/dc_opt.txt $out_dir/$src_name/dcir/dace_compile.txt
 
   rm -r tmp_folder
@@ -156,9 +156,9 @@ for filename in $benchmarks; do
   src=$filename
   src_name=$(basename ${src%.*})
 
-  if [ "$src_name" != "floyd-warshall" ]; then
-    continue
-  fi
+  # if [ "$src_name" != "floyd-warshall" ]; then
+  #   continue
+  # fi
 
   mkdir -p $out_dir/$src_name
 
