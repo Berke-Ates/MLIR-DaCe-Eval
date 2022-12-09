@@ -1,0 +1,16 @@
+SDFG 0: Promoted 12 scalars to symbols.
+Fused 32 states.
+Inferred 3 optional arrays.
+Propagated 12 constants.
+SDFG 0: Promoted 6 scalars to symbols.
+Fused 9 states.
+Propagated 5 constants.
+SDFG 0: Eliminated 1 arrays: {'_load_tmp_41'}.
+SDFG 0: Promoted 2 scalars to symbols.
+Fused 2 states.
+Propagated 1 constants.
+Fused 1 states.
+Fused 4 states.
+Applied 2 LoopToMap.
+Fused 8 states.
+SDFG 0: Eliminated 3 nodes in 1 states: defaultdict(<class 'set'>, {SDFGState (single_state_body): {MapEntry (single_state_body_map[for_idx_23=0:100000]), MapExit (single_state_body_map[for_idx_23=0:100000]), NestedSDFG (loop_body)}})

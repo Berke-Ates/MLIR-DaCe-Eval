@@ -1,0 +1,9 @@
+Applied LoopToMap: 15
+RefineNestedAccess: 1
+Eliminated Arrays: 53
+Fused states: 434
+Inferred optional arrays: 16
+Promoted scalars to symbols: 133
+Propagated constants: 130
+Statically allocating transient arrays: 47
+Eliminated 54 nodes in 20 states

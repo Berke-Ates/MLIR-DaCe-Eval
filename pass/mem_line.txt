@@ -1,0 +1,19 @@
+SDFG 0: Promoted 14 scalars to symbols.
+Fused 39 states.
+Inferred 2 optional arrays.
+Propagated 14 constants.
+SDFG 0: Promoted 7 scalars to symbols.
+Fused 10 states.
+Propagated 7 constants.
+SDFG 0: Eliminated 6 arrays: {'tmp_20', '_addf_tmp_48', 'tmp_12', 'tmp_4', 'tmp_19', 'tmp_11'}.
+SDFG 0: Promoted 1 scalars to symbols.
+Fused 2 states.
+Propagated 1 constants.
+SDFG 0: Promoted 1 scalars to symbols.
+Fused 1 states.
+Propagated 1 constants.
+Statically allocating 5 transient arrays
+Fused 3 states.
+Applied 3 LoopToMap.
+Fused 10 states.
+SDFG 0: Eliminated 5 nodes in 1 states: defaultdict(<class 'set'>, {SDFGState (constant_1): {AccessNode (_constant_tmp_8), MapEntry (single_state_body_map[for_idx_15=1:21]), NestedSDFG (loop_body), MapExit (single_state_body_map[for_idx_15=1:21]), Tasklet (constant)}})

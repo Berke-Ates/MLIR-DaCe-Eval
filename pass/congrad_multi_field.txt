@@ -1,0 +1,31 @@
+SDFG 0: Promoted 48 scalars to symbols.
+Fused 162 states.
+Inferred 9 optional arrays.
+Propagated 43 constants.
+SDFG 0: Promoted 15 scalars to symbols.
+Fused 18 states.
+Propagated 16 constants.
+SDFG 0: Eliminated 8 nodes in 3 states: defaultdict(<class 'set'>, {SDFGState (load_227): {AccessNode (_alloc_tmp_39), Tasklet (indirect_store_alloc_tmp_39), Tasklet (indirect_store_alloc_tmp_33), AccessNode (_alloc_tmp_33)}, SDFGState (load_157): {AccessNode (_alloc_tmp_41), Tasklet (indirect_store_alloc_tmp_41)}, SDFGState (store_138): {AccessNode (_alloc_tmp_41), Tasklet (indirect_store_alloc_tmp_41)}})
+SDFG 0: Eliminated 38 arrays: {'_load_tmp_160', '_subf_tmp_107', 'tmp_51', 'tmp_36', 'tmp_75', '_load_tmp_226', 'tmp_29', 'tmp_33', 'tmp_6', '_load_tmp_94', '_load_tmp_102', 'tmp_76', '_load_tmp_112', 'tmp_49', '_mulf_tmp_101', '_load_tmp_232', '_mulf_tmp_111', 'tmp_38', '_load_tmp_164', 'tmp_74', 'tmp_42', 'tmp_43', 'tmp_47', 'tmp_60', '_mulf_tmp_163', 'tmp_59', '_subf_tmp_123', '_divf_tmp_167', 'tmp_5', '_sitofp_tmp_28', 'tmp_32', '_load_tmp_229', '_divf_tmp_134', 'tmp_4', 'tmp_67', '_mulf_tmp_121', 'tmp_44', 'tmp_48'}.
+SDFG 0: Promoted 6 scalars to symbols.
+Fused 13 states.
+Propagated 10 constants.
+SDFG 0: Eliminated 6 nodes in 2 states: defaultdict(<class 'set'>, {SDFGState (load_227): {Tasklet (indirect_load_alloc_tmp_31), Tasklet (indirect_load_alloc_tmp_37), AccessNode (tmp_84), AccessNode (tmp_87)}, SDFGState (load_157): {AccessNode (_divf_tmp_169), Tasklet (divf)}})
+Fused 10 states.
+SDFG 0: Eliminated 4 nodes in 2 states: defaultdict(<class 'set'>, {SDFGState (load_233): {AccessNode (_alloc_tmp_31), Tasklet (indirect_store_alloc_tmp_31)}, SDFGState (load_157): {Tasklet (divf), AccessNode (tmp_66)}})
+SDFG 0: Eliminated 6 nodes in 2 states: defaultdict(<class 'set'>, {SDFGState (load_233): {Tasklet (indirect_load_alloc_tmp_35), AccessNode (tmp_90)}, SDFGState (load_157): {AccessNode (tmp_63), Tasklet (indirect_load_alloc_tmp_31), AccessNode (tmp_65), Tasklet (mulf)}})
+SDFG 0: Eliminated 4 nodes in 1 states: defaultdict(<class 'set'>, {SDFGState (load_157): {AccessNode (tmp_62), AccessNode (_mulf_tmp_159), Tasklet (indirect_load_alloc_tmp_37), Tasklet (mulf)}})
+SDFG 0: Eliminated 8 nodes in 4 states: defaultdict(<class 'set'>, {SDFGState (load_157): {AccessNode (_load_tmp_156), Tasklet (indirect_load_alloc_tmp_35)}, SDFGState (load_93): {AccessNode (_alloc_tmp_37), Tasklet (indirect_store_alloc_tmp_37)}, SDFGState (store_73): {AccessNode (_alloc_tmp_37), Tasklet (indirect_store_alloc_tmp_37)}, SDFGState (store_51): {AccessNode (_alloc_tmp_37), Tasklet (indirect_store_alloc_tmp_37)}})
+SDFG 0: Eliminated 1 arrays: {'_alloc_tmp_37'}.
+SDFG 0: Eliminated 2 nodes in 1 states: defaultdict(<class 'set'>, {SDFGState (load_93): {Tasklet (divf), AccessNode (tmp_52)}})
+SDFG 0: Eliminated 2 nodes in 1 states: defaultdict(<class 'set'>, {SDFGState (load_93): {AccessNode (_mulf_tmp_132), Tasklet (mulf)}})
+Statically allocating 37 transient arrays
+Fused 10 states.
+Applied 7 LoopToMap, 1 RefineNestedAccess.
+Fused 24 states.
+SDFG 0: Eliminated 6 nodes in 2 states: defaultdict(<class 'set'>, {SDFGState (single_state_body_1): {MapEntry (single_state_body_1_map[for_idx_209=0:10000]), MapExit (single_state_body_1_map[for_idx_209=0:10000]), NestedSDFG (loop_body)}, SDFGState (store_60): {MapExit (single_state_body_0_map[for_idx_139=1:10000]), MapEntry (single_state_body_0_map[for_idx_139=1:10000]), NestedSDFG (loop_body)}})
+SDFG 0: Eliminated 1 arrays: {'_alloc_tmp_35'}.
+Fused 1 states.
+Fused 1 states.
+Fused 1 states.
+Fused 1 states.

@@ -1,0 +1,24 @@
+SDFG 0: Promoted 21 scalars to symbols.
+SDFG 1: Promoted 37 scalars to symbols.
+Fused 141 states.
+Inferred 12 optional arrays.
+Propagated 54 constants.
+Removed 4 unused symbols: {(1, 'for_idx_67'), (1, 'for_idx_37'), (1, 'for_idx_61'), (1, 'for_idx_29')}.
+SDFG 0: Promoted 11 scalars to symbols.
+SDFG 1: Promoted 5 scalars to symbols.
+Fused 23 states.
+Propagated 21 constants.
+SDFG 0: Eliminated 8 arrays: {'tmp_22', 'tmp_7', '_divf_tmp_52', 'tmp_23', '_sitofp_tmp_50', 'tmp_5', 'tmp_8', 'tmp_6'}.
+SDFG 1: Eliminated 21 arrays: {'tmp_44', 'tmp_74', '_load_tmp_117', '_addf_tmp_114', '_load_tmp_149', 'tmp_48', 'tmp_54', 'tmp_37', '_divf_tmp_131', 'tmp_79', '_mulf_tmp_174', 'tmp_83', 'tmp_45', 'tmp_35', '_mulf_tmp_154', 'tmp_86', 'tmp_43', 'tmp_69', 'tmp_88', '_load_tmp_107', 'tmp_73'}.
+SDFG 0: Promoted 2 scalars to symbols.
+SDFG 1: Promoted 1 scalars to symbols.
+Fused 11 states.
+Propagated 4 constants.
+Fused 2 states.
+Statically allocating 29 transient arrays
+Fused 5 states.
+Applied 7 LoopToMap, 3 RefineNestedAccess.
+Fused 24 states.
+Removed 3 unused symbols: {(4, 'for_idx_136'), (4, 'for_idx_94'), (3, 'for_idx_61')}.
+Inlined 2 SDFGs.
+Applied 2 MapCollapse.

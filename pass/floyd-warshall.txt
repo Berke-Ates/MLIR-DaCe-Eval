@@ -1,0 +1,2 @@
+Applied 68 StateFusion.
+Statically allocating 91 transient arrays

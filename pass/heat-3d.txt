@@ -1,0 +1,20 @@
+SDFG 0: Promoted 78 scalars to symbols.
+Fused 188 states.
+Inferred 3 optional arrays.
+Propagated 75 constants.
+SDFG 0: Promoted 26 scalars to symbols.
+Fused 34 states.
+Propagated 27 constants.
+SDFG 0: Eliminated 47 arrays: {'_load_tmp_114', 'tmp_120', '_addf_tmp_127', '_load_tmp_98', 'tmp_134', '_load_tmp_96', 'tmp_135', 'tmp_7', 'tmp_106', 'tmp_114', 'tmp_54', 'tmp_100', '_addf_tmp_217', '_divf_tmp_64', '_addf_tmp_145', 'tmp_66', 'tmp_8', 'tmp_81', 'tmp_9', '_load_tmp_106', '_addf_tmp_201', '_addf_tmp_183', 'tmp_68', 'tmp_10', 'tmp_101', '_addf_tmp_123', '_load_tmp_194', '_load_tmp_170', 'tmp_108', 'tmp_127', 'tmp_74', 'tmp_25', 'tmp_61', '_mulf_tmp_111', '_mulf_tmp_101', '_load_tmp_188', '_subf_tmp_103', 'tmp_128', 'tmp_80', '_mulf_tmp_62', 'tmp_121', '_load_tmp_172', 'tmp_137', '_load_tmp_210', 'tmp_75', '_addf_tmp_143', '_mulf_tmp_141'}.
+SDFG 0: Promoted 15 scalars to symbols.
+Fused 21 states.
+Propagated 17 constants.
+Fused 2 states.
+Statically allocating 47 transient arrays
+Fused 16 states.
+Applied 9 LoopToMap, 6 RefineNestedAccess.
+Fused 33 states.
+SDFG 5: Consolidated 8 edges.
+SDFG 6: Consolidated 8 edges.
+Inlined 6 SDFGs.
+Applied 6 MapCollapse.

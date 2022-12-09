@@ -1,0 +1,15 @@
+Applied SubgraphFusion: 2
+Applied LoopToMap: 163
+RefineNestedAccess: 96
+Applied MapCollapse: 47
+Consolidated edges: 43
+Eliminated Arrays: 854
+Fused states: 5933
+Inferred optional arrays: 177
+Inlined SDFGs: 61
+Promoted scalars to symbols: 2178
+Propagated constants: 2185
+Removed unused symbols: 56
+Statically allocating transient arrays: 947
+Applied MoveLoopIntoMap: 1
+Applied StateFusion: 68
