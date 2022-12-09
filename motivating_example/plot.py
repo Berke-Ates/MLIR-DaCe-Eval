@@ -19,7 +19,7 @@ def add_median_labels(ax, precision='.2f'):
         value = x if (median.get_xdata()[1] -
                       median.get_xdata()[0]) == 0 else y
         text = ax.text(x,
-                       y + 75,
+                       y + 55,
                        f'{value:{precision}}',
                        ha='center',
                        va='bottom',
@@ -37,7 +37,7 @@ dt = pd.read_csv("timings/timings_clang.csv")
 sns.set(style="darkgrid")
 sns.set(font_scale=1.25)
 
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(8, 4))
 box_plot = sns.boxplot(data=dt, notch=True)
 
 ax = box_plot.axes
