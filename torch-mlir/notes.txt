@@ -1,0 +1,12 @@
+
+# mhli -> linalg
+mlir-hlo-opt --hlo-legalize-to-linalg
+
+# bufferize linalg
+mlir-hlo-opt --linalg-bufferize
+
+# linalg -> affine
+mlir-hlo-opt --convert-linalg-to-affine-loops
+
+# tensor -> memref
+mlir-hlo-opt --computeop-and-func-bufferize --final-bufferize=alignment=128
